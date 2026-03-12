@@ -36,6 +36,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         PermissionOnboardingWindowController.shared.showIfNeeded { [weak self] in
             self?.checkPermissionsAndRegisterHotkeys()
             self?.startPermissionMonitoring()
+
+            // Show welcome HUD with shortcuts after permissions are set up
+            WelcomeHUDWindowController.shared.showIfNeeded()
         }
     }
 
