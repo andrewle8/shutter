@@ -223,7 +223,9 @@ struct AnnotationEditorView: View {
     @State private var showOCRResult = false
     @State private var isDescribingImage = false
     @State private var aiDescriptionResult: String? = nil
+    @State private var aiDescriptionIsError = false
     @State private var showAIDescription = false
+    @State private var hasLLMApiKey = false
 
     // HUD feedback state
     @State private var showCopiedHUD = false
@@ -483,6 +485,9 @@ struct AnnotationEditorView: View {
         }
         .frame(minWidth: 1100, idealWidth: showBackdropPanel ? 1300 : 1100, minHeight: 700)
         .background(Color(nsColor: .windowBackgroundColor))
+        .onAppear {
+            hasLLMApiKey = !SettingsManager.shared.settings.llmApiKey.isEmpty
+        }
     }
 
     // MARK: - Screenshot Image View
@@ -841,25 +846,21 @@ struct AnnotationEditorView: View {
             Spacer()
 
             HStack(alignment: .top, spacing: 12) {
-                Image(systemName: result.hasPrefix("Error:") ? "exclamationmark.triangle.fill" : "sparkles")
+                Image(systemName: aiDescriptionIsError ? "exclamationmark.triangle.fill" : "sparkles")
                     .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(result.hasPrefix("Error:") ? .orange : .purple)
+                    .foregroundColor(aiDescriptionIsError ? .orange : .purple)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(result.hasPrefix("Error:") ? "Description failed" : "AI description")
+                    Text(aiDescriptionIsError ? "Description failed" : "AI description")
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(.primary)
 
-                    if result.hasPrefix("Error:") {
-                        Text(result.replacingOccurrences(of: "Error: ", with: ""))
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                    } else {
-                        Text(result)
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                            .lineLimit(4)
+                    Text(result)
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                        .lineLimit(4)
 
+                    if !aiDescriptionIsError {
                         Text("Copied to clipboard")
                             .font(.system(size: 10))
                             .foregroundColor(.purple.opacity(0.8))
@@ -1235,7 +1236,7 @@ struct AnnotationEditorView: View {
                 .help("Extract text from image and copy to clipboard")
 
                 // AI Describe Button
-                if !SettingsManager.shared.settings.llmApiKey.isEmpty {
+                if hasLLMApiKey {
                     Button(action: performAIDescribe) {
                         HStack(spacing: 5) {
                             if isDescribingImage {
@@ -1420,21 +1421,24 @@ struct AnnotationEditorView: View {
     private func performAIDescribe() {
         isDescribingImage = true
 
-        LLMService.shared.describeImage(displayImage) { [self] result in
-            isDescribingImage = false
+        Task {
+            do {
+                let description = try await LLMService.shared.describeImage(displayImage)
+                isDescribingImage = false
+                aiDescriptionIsError = false
+                aiDescriptionResult = description
 
-            switch result {
-            case .success(let description):
-                // Copy to clipboard
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(description, forType: .string)
-                aiDescriptionResult = description
+
                 withAnimation(.spring(response: 0.3)) {
                     showAIDescription = true
                 }
+            } catch {
+                isDescribingImage = false
+                aiDescriptionIsError = true
+                aiDescriptionResult = error.localizedDescription
 
-            case .failure(let error):
-                aiDescriptionResult = "Error: \(error.localizedDescription)"
                 withAnimation(.spring(response: 0.3)) {
                     showAIDescription = true
                 }

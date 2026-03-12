@@ -7,6 +7,7 @@ class WelcomeHUDWindowController {
 
     private var window: NSWindow?
     private var dismissTimer: Timer?
+    private var isDismissing = false
 
     private init() {}
 
@@ -70,6 +71,9 @@ class WelcomeHUDWindowController {
     }
 
     private func dismiss() {
+        guard !isDismissing else { return }
+        isDismissing = true
+
         dismissTimer?.invalidate()
         dismissTimer = nil
 
