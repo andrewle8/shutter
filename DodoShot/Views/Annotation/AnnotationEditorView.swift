@@ -1425,10 +1425,19 @@ struct AnnotationEditorView: View {
         let scaleX = imageSize.width / self.imageSize.width
         let scaleY = imageSize.height / self.imageSize.height
 
+        // The annotation canvas NSView uses isFlipped=true (Y=0 at top, increases downward)
+        // but NSImage lockFocus context has Y=0 at bottom (Cocoa default).
+        // Flip the context so annotation coordinates render correctly.
+        context.saveGState()
+        context.translateBy(x: 0, y: imageSize.height)
+        context.scaleBy(x: 1, y: -1)
+
         // Draw all annotations
         for annotation in annotations {
             drawAnnotationOnImage(annotation, in: context, scaleX: scaleX, scaleY: scaleY)
         }
+
+        context.restoreGState()
 
         newImage.unlockFocus()
         return newImage
@@ -1549,8 +1558,12 @@ struct AnnotationEditorView: View {
         let scaleX = imageSize.width / self.imageSize.width
         let scaleY = imageSize.height / self.imageSize.height
 
-        // Translate context to image origin
-        context.translateBy(x: paddingX, y: paddingY)
+        // Translate context to image origin, and flip Y axis.
+        // Annotations use top-left origin (isFlipped=true canvas), but NSImage
+        // lockFocus context uses bottom-left origin. We need to flip within the
+        // image rect so annotations land in the correct position.
+        context.translateBy(x: paddingX, y: paddingY + imageSize.height)
+        context.scaleBy(x: 1, y: -1)
 
         for annotation in annotations {
             drawAnnotationOnImage(annotation, in: context, scaleX: scaleX, scaleY: scaleY)
