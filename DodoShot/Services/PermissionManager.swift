@@ -37,11 +37,13 @@ final class PermissionManager: ObservableObject {
 
     /// Check screen recording permission
     func checkScreenRecordingPermission() {
-        // CGPreflightScreenCaptureAccess is UNRELIABLE - it often returns true even without permission
-        // The ONLY reliable check is to actually capture and verify we get real content (not gray)
-        let hasAccess = canActuallyCaptureScreen()
+        // Use CGPreflightScreenCaptureAccess which is the recommended API for
+        // checking permission status without triggering the screen recording
+        // indicator. This avoids the persistent recording notification (issue #6)
+        // and is more reliable than the old capture-and-sample approach (issue #7).
+        let hasAccess = CGPreflightScreenCaptureAccess()
 
-        NSLog("[PermissionManager] Screen recording check (actual capture test): %@", hasAccess ? "true" : "false")
+        NSLog("[PermissionManager] Screen recording check (preflight): %@", hasAccess ? "true" : "false")
 
         DispatchQueue.main.async { [weak self] in
             if self?.isScreenRecordingGranted != hasAccess {
@@ -49,95 +51,6 @@ final class PermissionManager: ObservableObject {
                 self?.isScreenRecordingGranted = hasAccess
             }
         }
-    }
-
-    /// Actually try to capture the screen and verify we get real content
-    private func canActuallyCaptureScreen() -> Bool {
-        // Get the list of windows on screen (excluding our own app)
-        let windowList = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
-
-        // Find a window that's not ours to capture
-        let bundleID = Bundle.main.bundleIdentifier ?? ""
-        for windowInfo in windowList {
-            guard let _ = windowInfo[kCGWindowOwnerName as String] as? String,
-                  let windowNumber = windowInfo[kCGWindowNumber as String] as? CGWindowID,
-                  let bounds = windowInfo[kCGWindowBounds as String] as? [String: Any],
-                  let width = bounds["Width"] as? CGFloat,
-                  let height = bounds["Height"] as? CGFloat,
-                  width > 10, height > 10 else {
-                continue
-            }
-
-            // Skip our own windows
-            if let ownerBundleID = windowInfo[kCGWindowOwnerPID as String] as? Int32 {
-                let app = NSRunningApplication(processIdentifier: ownerBundleID)
-                if app?.bundleIdentifier == bundleID {
-                    continue
-                }
-            }
-
-            // Try to capture this specific window
-            if let image = CGWindowListCreateImage(.null, .optionIncludingWindow, windowNumber, [.boundsIgnoreFraming]) {
-                // Check if the image has actual content by sampling pixels
-                // Without permission, we get either nil or an all-gray image
-                if imageHasRealContent(image) {
-                    return true
-                }
-            }
-        }
-
-        return false
-    }
-
-    /// Check if a captured image has real content (not just uniform gray)
-    private func imageHasRealContent(_ image: CGImage) -> Bool {
-        let width = image.width
-        let height = image.height
-
-        guard width > 0, height > 0 else { return false }
-
-        // Create a small bitmap context to sample pixels
-        let bytesPerPixel = 4
-        let bytesPerRow = bytesPerPixel * width
-        var pixelData = [UInt8](repeating: 0, count: bytesPerRow * height)
-
-        guard let context = CGContext(
-            data: &pixelData,
-            width: width,
-            height: height,
-            bitsPerComponent: 8,
-            bytesPerRow: bytesPerRow,
-            space: CGColorSpaceCreateDeviceRGB(),
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-        ) else {
-            return false
-        }
-
-        context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
-
-        // Sample a few pixels and check for variance
-        // If all pixels are the same gray, we don't have real access
-        let samplePoints = [
-            (width / 4, height / 4),
-            (width / 2, height / 2),
-            (3 * width / 4, 3 * height / 4),
-            (width / 3, 2 * height / 3)
-        ]
-
-        var colors = Set<UInt32>()
-        for (x, y) in samplePoints {
-            let offset = (y * width + x) * bytesPerPixel
-            if offset + 3 < pixelData.count {
-                let r = pixelData[offset]
-                let g = pixelData[offset + 1]
-                let b = pixelData[offset + 2]
-                let color = UInt32(r) << 16 | UInt32(g) << 8 | UInt32(b)
-                colors.insert(color)
-            }
-        }
-
-        // If we have more than one unique color, we have real content
-        return colors.count > 1
     }
 
     /// Check accessibility permission
