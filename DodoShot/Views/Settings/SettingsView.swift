@@ -54,6 +54,18 @@ struct GeneralSettingsTab: View {
                             }
                         )
                     )
+
+                    SettingsToggleRow(
+                        icon: "dock.rectangle",
+                        title: "Show in Dock",
+                        description: "Show DodoShot in the Dock and Cmd-Tab switcher. Changes apply on next launch.",
+                        isOn: Binding(
+                            get: { settingsManager.settings.showInDock },
+                            set: { newValue in
+                                settingsManager.settings.showInDock = newValue
+                            }
+                        )
+                    )
                 }
 
                 // Appearance Section
