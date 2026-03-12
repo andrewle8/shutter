@@ -543,11 +543,15 @@ class ScreenCaptureService: ObservableObject {
         NSLog("[ScreenCaptureService] Screenshot created with id: %@", screenshotId.uuidString)
 
         currentCapture = screenshot
-        recentCaptures.insert(screenshot, at: 0)
 
-        // Keep only last 10 captures
-        if recentCaptures.count > 10 {
-            recentCaptures = Array(recentCaptures.prefix(10))
+        // Only save to history if enabled in settings
+        if SettingsManager.shared.settings.saveHistory {
+            recentCaptures.insert(screenshot, at: 0)
+
+            // Keep only last 10 captures
+            if recentCaptures.count > 10 {
+                recentCaptures = Array(recentCaptures.prefix(10))
+            }
         }
 
         // Auto copy to clipboard

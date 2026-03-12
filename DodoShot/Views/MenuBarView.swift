@@ -75,6 +75,11 @@ struct MenuBarView: View {
 
             Spacer()
 
+            // Settings button
+            HeaderButton(icon: "gearshape", tooltip: L10n.Settings.general) {
+                openSettings()
+            }
+
             // History button
             HeaderButton(icon: "clock.arrow.circlepath", tooltip: L10n.Menu.history) {
                 CaptureHistoryWindowController.shared.showHistory()

@@ -408,6 +408,7 @@ struct AppSettings: Codable {
         case autoSaveOnEditorClose, autoCopyOnEditorClose, maxVideoRecordingDuration
         case defaultRedactionStyle, defaultRedactionIntensity, defaultStepCounterFormat
         case showInDock
+        case saveHistory
         // Legacy key for backward compatibility
         case llmApiKey
     }
@@ -461,6 +462,7 @@ struct AppSettings: Codable {
         defaultRedactionIntensity = try container.decodeIfPresent(Double.self, forKey: .defaultRedactionIntensity) ?? 0.7
         defaultStepCounterFormat = try container.decodeIfPresent(StepCounterFormat.self, forKey: .defaultStepCounterFormat) ?? .numeric
         showInDock = try container.decodeIfPresent(Bool.self, forKey: .showInDock) ?? true
+        saveHistory = try container.decodeIfPresent(Bool.self, forKey: .saveHistory) ?? true
     }
 
     // Custom encoder - don't encode the computed llmApiKey
@@ -494,6 +496,7 @@ struct AppSettings: Codable {
         try container.encode(defaultRedactionIntensity, forKey: .defaultRedactionIntensity)
         try container.encode(defaultStepCounterFormat, forKey: .defaultStepCounterFormat)
         try container.encode(showInDock, forKey: .showInDock)
+        try container.encode(saveHistory, forKey: .saveHistory)
     }
     var autoCopyToClipboard: Bool
     var showQuickOverlay: Bool
@@ -519,6 +522,7 @@ struct AppSettings: Codable {
     var defaultRedactionIntensity: Double
     var defaultStepCounterFormat: StepCounterFormat
     var showInDock: Bool
+    var saveHistory: Bool
 
     // Memberwise init (needed because we have custom Codable)
     init(
@@ -549,7 +553,8 @@ struct AppSettings: Codable {
         defaultRedactionStyle: RedactionStyle,
         defaultRedactionIntensity: Double,
         defaultStepCounterFormat: StepCounterFormat,
-        showInDock: Bool
+        showInDock: Bool,
+        saveHistory: Bool
     ) {
         self.anthropicApiKey = anthropicApiKey
         self.openaiApiKey = openaiApiKey
@@ -579,6 +584,7 @@ struct AppSettings: Codable {
         self.defaultRedactionIntensity = defaultRedactionIntensity
         self.defaultStepCounterFormat = defaultStepCounterFormat
         self.showInDock = showInDock
+        self.saveHistory = saveHistory
     }
 
     static var `default`: AppSettings {
@@ -613,7 +619,8 @@ struct AppSettings: Codable {
             defaultRedactionStyle: .blur,
             defaultRedactionIntensity: 0.7,
             defaultStepCounterFormat: .numeric,
-            showInDock: true
+            showInDock: true,
+            saveHistory: true
         )
     }
 

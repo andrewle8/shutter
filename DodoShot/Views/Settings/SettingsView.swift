@@ -68,6 +68,28 @@ struct GeneralSettingsTab: View {
                     )
                 }
 
+                // Privacy Section
+                SettingsSection(
+                    icon: "hand.raised",
+                    title: "Privacy",
+                    iconColor: .blue
+                ) {
+                    SettingsToggleRow(
+                        icon: "clock.arrow.circlepath",
+                        title: "Save capture history",
+                        description: "Keep recent captures in memory for quick access",
+                        isOn: Binding(
+                            get: { settingsManager.settings.saveHistory },
+                            set: { newValue in
+                                settingsManager.settings.saveHistory = newValue
+                                if !newValue {
+                                    ScreenCaptureService.shared.clearRecents()
+                                }
+                            }
+                        )
+                    )
+                }
+
                 // Appearance Section
                 SettingsSection(
                     icon: "paintbrush",
