@@ -252,11 +252,26 @@ struct PermissionOnboardingView: View {
                 Text("Enable DodoShot in Accessibility settings")
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
-                Text("You may need to use the '+' button to add DodoShot manually")
+                Text("After enabling, click restart below to apply")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary.opacity(0.7))
             }
             .multilineTextAlignment(.center)
+
+            // Restart button
+            Button(action: {
+                permissionManager.restartApp()
+            }) {
+                HStack(spacing: 6) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 12, weight: .medium))
+                    Text("Restart DodoShot")
+                        .font(.system(size: 13, weight: .medium))
+                }
+                .foregroundColor(.secondary)
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 4)
 
             Spacer()
 
