@@ -37,17 +37,26 @@ final class PermissionManager: ObservableObject {
 
     /// Check screen recording permission
     func checkScreenRecordingPermission() {
-        // Use CGPreflightScreenCaptureAccess which is the recommended API for
-        // checking permission status without triggering the screen recording
-        // indicator. This avoids the persistent recording notification (issue #6)
-        // and is more reliable than the old capture-and-sample approach (issue #7).
-        let hasAccess = CGPreflightScreenCaptureAccess()
+        // CGPreflightScreenCaptureAccess is the lightweight check but it caches
+        // the result per-process and doesn't update when the user toggles
+        // the permission in System Settings. During onboarding we need real-time
+        // detection, so fall back to a minimal 1x1 test capture when preflight
+        // returns false — CGWindowListCreateImage returns nil when not permitted.
+        var hasAccess = CGPreflightScreenCaptureAccess()
 
-        NSLog("[PermissionManager] Screen recording check (preflight): %@", hasAccess ? "true" : "false")
+        if !hasAccess {
+            // Try a minimal capture to check if permission was just granted
+            let testImage = CGWindowListCreateImage(
+                CGRect(x: 0, y: 0, width: 1, height: 1),
+                .optionOnScreenOnly,
+                kCGNullWindowID,
+                .bestResolution
+            )
+            hasAccess = testImage != nil
+        }
 
         DispatchQueue.main.async { [weak self] in
             if self?.isScreenRecordingGranted != hasAccess {
-                NSLog("[PermissionManager] Screen recording changed: %@", hasAccess ? "true" : "false")
                 self?.isScreenRecordingGranted = hasAccess
             }
         }
