@@ -1367,7 +1367,21 @@ struct AnnotationEditorView: View {
         pasteboard.clearContents()
         pasteboard.writeObjects([finalImage])
 
-        // Show HUD feedback then close
+        // Build a screenshot for the quick overlay before closing
+        let overlayScreenshot: Screenshot? = {
+            guard let tiff = finalImage.tiffRepresentation,
+                  let bmp = NSBitmapImageRep(data: tiff),
+                  let png = bmp.representation(using: .png, properties: [:]) else { return nil }
+            return Screenshot(
+                id: screenshotId,
+                pngData: png,
+                imageSize: finalImage.size,
+                capturedAt: screenshotCapturedAt,
+                captureType: screenshotCaptureType
+            )
+        }()
+
+        // Show HUD feedback then close and show quick overlay
         withAnimation(.spring(response: 0.3)) {
             hudMessage = "Copied to clipboard"
             showCopiedHUD = true
@@ -1375,6 +1389,9 @@ struct AnnotationEditorView: View {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
             onCancel()
+            if let shot = overlayScreenshot {
+                QuickOverlayManager.shared.showOverlay(for: shot)
+            }
         }
     }
 
