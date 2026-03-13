@@ -126,6 +126,24 @@ final class PermissionManager: ObservableObject {
         CGRequestScreenCaptureAccess()
     }
 
+    /// Reset stale accessibility entry and re-prompt
+    func resetAndRequestAccessibility() {
+        // Remove any stale entry for this bundle ID so the system prompt works cleanly
+        let task = Process()
+        task.launchPath = "/usr/bin/tccutil"
+        task.arguments = ["reset", "Accessibility", "com.dodoshot.app"]
+        try? task.run()
+        task.waitUntilExit()
+
+        // Clear the bypass flag
+        UserDefaults.standard.removeObject(forKey: "accessibilityBypassed")
+
+        // Small delay to let TCC database update, then prompt
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.requestAccessibilityPermission()
+        }
+    }
+
     /// Request accessibility permission
     @discardableResult
     func requestAccessibilityPermission() -> Bool {

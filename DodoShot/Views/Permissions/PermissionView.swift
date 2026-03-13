@@ -214,14 +214,14 @@ struct PermissionOnboardingView: View {
 
             Spacer()
 
-            // Action button
+            // Primary action: reset stale entry and show system prompt
             Button(action: {
-                permissionManager.openAccessibilitySettings()
+                permissionManager.resetAndRequestAccessibility()
             }) {
                 HStack(spacing: 8) {
-                    Image(systemName: "gear")
+                    Image(systemName: "hand.raised")
                         .font(.system(size: 14, weight: .medium))
-                    Text("Open accessibility settings")
+                    Text("Grant accessibility permission")
                         .font(.system(size: 14, weight: .medium))
                 }
                 .foregroundColor(.white)
@@ -234,10 +234,15 @@ struct PermissionOnboardingView: View {
             }
             .buttonStyle(.plain)
 
-            // Help text
-            Text("Enable DodoShot in Accessibility settings")
-                .font(.system(size: 11))
-                .foregroundColor(.secondary)
+            // Secondary: open settings manually
+            Button(action: {
+                permissionManager.openAccessibilitySettings()
+            }) {
+                Text("Open system settings manually")
+                    .font(.system(size: 12))
+                    .foregroundColor(.blue)
+            }
+            .buttonStyle(.plain)
 
             Spacer()
 
