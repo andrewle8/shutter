@@ -132,6 +132,7 @@ struct PermissionOnboardingView: View {
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: 340)
             }
 
@@ -197,6 +198,7 @@ struct PermissionOnboardingView: View {
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: 340)
             }
 
