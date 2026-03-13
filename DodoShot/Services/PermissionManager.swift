@@ -149,26 +149,17 @@ final class PermissionManager: ObservableObject {
 
     /// Open Accessibility settings in Privacy & Security
     func openAccessibilitySettings() {
-        // URL schemes for Privacy panes are unreliable across macOS versions.
-        // Use AppleScript which works on Sonoma, Sequoia, and Tahoe.
-        let script = """
-            tell application "System Settings"
-                activate
-                reveal anchor "Privacy_Accessibility" of pane id "com.apple.settings.PrivacySecurity.extension"
-            end tell
+        // System Settings doesn't reliably navigate between Privacy sub-panes
+        // when already open (e.g. stuck on Screen Recording from step 1).
+        // Quit it first, then reopen at the Accessibility pane.
+        let quitScript = """
+            tell application "System Settings" to quit
             """
-        if let appleScript = NSAppleScript(source: script) {
-            var error: NSDictionary?
-            appleScript.executeAndReturnError(&error)
-            if error != nil {
-                // Fallback: try without .extension suffix (older macOS)
-                let fallback = """
-                    tell application "System Settings"
-                        activate
-                        reveal anchor "Privacy_Accessibility" of pane id "com.apple.settings.PrivacySecurity"
-                    end tell
-                    """
-                NSAppleScript(source: fallback)?.executeAndReturnError(nil)
+        NSAppleScript(source: quitScript)?.executeAndReturnError(nil)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            if let url = URL(string: "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility") {
+                NSWorkspace.shared.open(url)
             }
         }
     }

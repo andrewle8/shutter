@@ -202,6 +202,7 @@ struct CaptureHistoryView: View {
                     Text(type.localizedName).tag(type)
                 }
             }
+            .labelsHidden()
             .pickerStyle(.segmented)
             .frame(width: 280)
 

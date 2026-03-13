@@ -1367,17 +1367,14 @@ struct AnnotationEditorView: View {
         pasteboard.clearContents()
         pasteboard.writeObjects([finalImage])
 
-        // Show HUD feedback
+        // Show HUD feedback then close
         withAnimation(.spring(response: 0.3)) {
             hudMessage = "Copied to clipboard"
             showCopiedHUD = true
         }
 
-        // Auto-hide after 2 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            withAnimation(.spring(response: 0.3)) {
-                showCopiedHUD = false
-            }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            onCancel()
         }
     }
 

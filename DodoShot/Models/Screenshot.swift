@@ -461,7 +461,7 @@ struct AppSettings: Codable {
         defaultRedactionStyle = try container.decodeIfPresent(RedactionStyle.self, forKey: .defaultRedactionStyle) ?? .blur
         defaultRedactionIntensity = try container.decodeIfPresent(Double.self, forKey: .defaultRedactionIntensity) ?? 0.7
         defaultStepCounterFormat = try container.decodeIfPresent(StepCounterFormat.self, forKey: .defaultStepCounterFormat) ?? .numeric
-        showInDock = try container.decodeIfPresent(Bool.self, forKey: .showInDock) ?? true
+        showInDock = try container.decodeIfPresent(Bool.self, forKey: .showInDock) ?? false
         saveHistory = try container.decodeIfPresent(Bool.self, forKey: .saveHistory) ?? true
     }
 
@@ -619,7 +619,7 @@ struct AppSettings: Codable {
             defaultRedactionStyle: .blur,
             defaultRedactionIntensity: 0.7,
             defaultStepCounterFormat: .numeric,
-            showInDock: true,
+            showInDock: false,
             saveHistory: true
         )
     }

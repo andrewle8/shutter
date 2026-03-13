@@ -30,7 +30,7 @@ struct PermissionOnboardingView: View {
                 completeStep
             }
         }
-        .frame(width: 480, height: 440)
+        .frame(width: 480, height: 540)
         .background(Color(nsColor: .windowBackgroundColor))
         .onAppear {
             permissionManager.startMonitoring()
@@ -105,8 +105,8 @@ struct PermissionOnboardingView: View {
             }
         }
         .padding(.horizontal, 20)
-        .padding(.top, 40)
-        .padding(.bottom, 20)
+        .padding(.top, 44)
+        .padding(.bottom, 16)
     }
 
     private var stepNumber: Int {
@@ -185,7 +185,7 @@ struct PermissionOnboardingView: View {
 
     // MARK: - Accessibility Step
     private var accessibilityStep: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 16) {
             Spacer()
 
             // Icon
@@ -214,66 +214,30 @@ struct PermissionOnboardingView: View {
 
             Spacer()
 
-            // Action buttons
-            VStack(spacing: 12) {
-                Button(action: {
-                    permissionManager.requestAccessibilityPermission()
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "hand.raised")
-                            .font(.system(size: 14, weight: .medium))
-                        Text("Request permission")
-                            .font(.system(size: 14, weight: .medium))
-                    }
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color.blue)
-                    )
-                }
-                .buttonStyle(.plain)
-
-                Button(action: {
-                    permissionManager.openAccessibilitySettings()
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "gear")
-                            .font(.system(size: 13, weight: .medium))
-                        Text("Open system settings")
-                            .font(.system(size: 13, weight: .medium))
-                    }
-                    .foregroundColor(.blue)
-                }
-                .buttonStyle(.plain)
-            }
-
-            // Help text
-            VStack(spacing: 4) {
-                Text("Enable DodoShot in Accessibility settings")
-                    .font(.system(size: 11))
-                    .foregroundColor(.secondary)
-                Text("After enabling, click restart below to apply")
-                    .font(.system(size: 10))
-                    .foregroundColor(.secondary.opacity(0.7))
-            }
-            .multilineTextAlignment(.center)
-
-            // Restart button
+            // Action button
             Button(action: {
-                permissionManager.restartApp()
+                permissionManager.openAccessibilitySettings()
             }) {
-                HStack(spacing: 6) {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 12, weight: .medium))
-                    Text("Restart DodoShot")
-                        .font(.system(size: 13, weight: .medium))
+                HStack(spacing: 8) {
+                    Image(systemName: "gear")
+                        .font(.system(size: 14, weight: .medium))
+                    Text("Open accessibility settings")
+                        .font(.system(size: 14, weight: .medium))
                 }
-                .foregroundColor(.secondary)
+                .foregroundColor(.white)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.blue)
+                )
             }
             .buttonStyle(.plain)
-            .padding(.top, 4)
+
+            // Help text
+            Text("Enable DodoShot in Accessibility settings")
+                .font(.system(size: 11))
+                .foregroundColor(.secondary)
 
             Spacer()
 
@@ -282,11 +246,12 @@ struct PermissionOnboardingView: View {
                 permissionManager.bypassAccessibility()
                 onComplete()
             }) {
-                Text("I've enabled it, continue")
-                    .font(.system(size: 11))
+                Text("I've enabled it, continue →")
+                    .font(.system(size: 13, weight: .medium))
                     .foregroundColor(.blue)
             }
             .buttonStyle(.plain)
+            .padding(.bottom, 8)
         }
         .padding(20)
     }
@@ -384,21 +349,21 @@ class PermissionOnboardingWindowController {
         }
 
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 440),
+            contentRect: NSRect(x: 0, y: 0, width: 480, height: 540),
             styleMask: [.titled, .closable],
             backing: .buffered,
             defer: false
         )
 
-        window.title = "DodoShot"
-        window.titlebarAppearsTransparent = true
-        window.titleVisibility = .hidden
+        window.title = "DodoShot Setup"
+        window.titlebarAppearsTransparent = false
+        window.titleVisibility = .visible
 
         // Position window lower on screen so it doesn't cover the OS permission modal
         if let screen = NSScreen.main {
             let screenFrame = screen.visibleFrame
             let windowWidth: CGFloat = 480
-            let _ = 440 // windowHeight - window auto-sizes to content
+            let _ = 540 // windowHeight - window auto-sizes to content
             // Center horizontally, position in lower third of screen
             let x = screenFrame.origin.x + (screenFrame.width - windowWidth) / 2
             let y = screenFrame.origin.y + screenFrame.height * 0.15 // Lower on screen
