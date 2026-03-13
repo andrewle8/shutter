@@ -277,15 +277,14 @@ struct PermissionOnboardingView: View {
 
             Spacer()
 
-            // Skip button
+            // Continue button — AXIsProcessTrusted can't detect ad-hoc signed apps
             Button(action: {
-                // For debug builds, bypass the accessibility check
-                permissionManager.bypassAccessibilityForDebug()
+                permissionManager.bypassAccessibility()
                 onComplete()
             }) {
-                Text("Skip for now (keyboard shortcuts won't work)")
+                Text("I've enabled it, continue")
                     .font(.system(size: 11))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.blue)
             }
             .buttonStyle(.plain)
         }

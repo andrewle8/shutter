@@ -77,17 +77,13 @@ final class PermissionManager: ObservableObject {
         // Use the result from AXIsProcessTrustedWithOptions as it's more reliable
         var finalResult = trusted || trustedWithOptions
 
-        // For DEBUG builds, allow bypassing accessibility check since ad-hoc signing
-        // causes issues with macOS recognizing the approved app after rebuilds
-        #if DEBUG
+        // Ad-hoc signed apps can't be reliably detected by AXIsProcessTrusted
+        // even when the user has enabled them in System Settings. Allow bypass.
         if !finalResult {
-            // Check if user has previously skipped (stored in UserDefaults)
-            if UserDefaults.standard.bool(forKey: "debugAccessibilityBypassed") {
-                NSLog("[PermissionManager] DEBUG: Accessibility bypassed by user preference")
+            if UserDefaults.standard.bool(forKey: "accessibilityBypassed") {
                 finalResult = true
             }
         }
-        #endif
 
         DispatchQueue.main.async { [weak self] in
             if self?.isAccessibilityGranted != finalResult {
@@ -97,13 +93,10 @@ final class PermissionManager: ObservableObject {
         }
     }
 
-    /// Bypass accessibility check for debug builds
-    func bypassAccessibilityForDebug() {
-        #if DEBUG
-        UserDefaults.standard.set(true, forKey: "debugAccessibilityBypassed")
+    /// Bypass accessibility check (ad-hoc signed apps can't be reliably detected)
+    func bypassAccessibility() {
+        UserDefaults.standard.set(true, forKey: "accessibilityBypassed")
         isAccessibilityGranted = true
-        NSLog("[PermissionManager] DEBUG: Accessibility check bypassed")
-        #endif
     }
 
     /// Request screen recording permission
