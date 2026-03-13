@@ -37,6 +37,7 @@
 		FR2A3B4C5D6E7F8A9B0C1D2E /* fr.lproj in Resources */ = {isa = PBXBuildFile; fileRef = FR1A2B3C4D5E6F7A8B9C0D1E /* fr.lproj */; };
 		ES2A3B4C5D6E7F8A9B0C1D2E /* es.lproj in Resources */ = {isa = PBXBuildFile; fileRef = ES1A2B3C4D5E6F7A8B9C0D1E /* es.lproj */; };
 		DE2A3B4C5D6E7F8A9B0C1D2E /* de.lproj in Resources */ = {isa = PBXBuildFile; fileRef = DE1A2B3C4D5E6F7A8B9C0D1E /* de.lproj */; };
+		WH2A3B4C5D6E7F8A9B0C1D2E /* WelcomeHUDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WH1A2B3C4D5E6F7A8B9C0D1E /* WelcomeHUDView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -73,6 +74,7 @@
 		ES1A2B3C4D5E6F7A8B9C0D1E /* es.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = es.lproj; sourceTree = "<group>"; };
 		DE1A2B3C4D5E6F7A8B9C0D1E /* de.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = de.lproj; sourceTree = "<group>"; };
 		W0A1B2C3D4E5F6A7B8C9D0E1 /* WindowInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowInfo.swift; sourceTree = "<group>"; };
+		WH1A2B3C4D5E6F7A8B9C0D1E /* WelcomeHUDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeHUDView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -185,6 +187,7 @@
 			isa = PBXGroup;
 			children = (
 				B000000009 /* QuickOverlayView.swift */,
+				WH1A2B3C4D5E6F7A8B9C0D1E /* WelcomeHUDView.swift */,
 			);
 			path = Overlay;
 			sourceTree = "<group>";
@@ -331,6 +334,7 @@
 				W1A2B3C4D5E6F7A8B9C0D1E2 /* WindowInfo.swift in Sources */,
 				IFA000001 /* ImageFormatAnalyzer.swift in Sources */,
 				LAA000001 /* LaunchAtLoginManager.swift in Sources */,
+				WH2A3B4C5D6E7F8A9B0C1D2E /* WelcomeHUDView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
