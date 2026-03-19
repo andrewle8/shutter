@@ -56,22 +56,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     private func startPermissionMonitoring() {
-        // Check every 3 seconds if permissions changed.
-        // Uses CGPreflightScreenCaptureAccess (lightweight, no screen recording indicator)
-        // instead of actual capture attempts that trigger the persistent recording dot.
-        permissionCheckTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { [weak self] _ in
+        // Check every 5 seconds if permissions changed.
+        // Uses ScreenCaptureKit which provides accurate real-time status
+        // without triggering the persistent screen recording indicator.
+        // Don't stop polling — macOS can revoke permissions at any time
+        // (e.g. after app updates with ad-hoc signing), and
+        // CGPreflightScreenCaptureAccess caches stale results per-process.
+        permissionCheckTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
             let permissionManager = PermissionManager.shared
             permissionManager.checkPermissions()
 
             // Register hotkeys once accessibility is granted
             if AXIsProcessTrusted() {
                 self?.hotkeyManager.registerHotkeys()
-            }
-
-            // Stop polling once all permissions are granted
-            if permissionManager.allPermissionsGranted {
-                self?.permissionCheckTimer?.invalidate()
-                self?.permissionCheckTimer = nil
             }
         }
     }

@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import Combine
+import ScreenCaptureKit
 
 /// Manager for handling Screen Recording and Accessibility permissions
 final class PermissionManager: ObservableObject {
@@ -35,29 +36,16 @@ final class PermissionManager: ObservableObject {
         checkAccessibilityPermission()
     }
 
-    /// Check screen recording permission
+    /// Check screen recording permission using ScreenCaptureKit.
+    /// SCShareableContent provides accurate, real-time permission status
+    /// unlike CGPreflightScreenCaptureAccess which caches per-process.
     func checkScreenRecordingPermission() {
-        // CGPreflightScreenCaptureAccess is the lightweight check but it caches
-        // the result per-process and doesn't update when the user toggles
-        // the permission in System Settings. During onboarding we need real-time
-        // detection, so fall back to a minimal 1x1 test capture when preflight
-        // returns false — CGWindowListCreateImage returns nil when not permitted.
-        var hasAccess = CGPreflightScreenCaptureAccess()
-
-        if !hasAccess {
-            // Try a minimal capture to check if permission was just granted
-            let testImage = CGWindowListCreateImage(
-                CGRect(x: 0, y: 0, width: 1, height: 1),
-                .optionOnScreenOnly,
-                kCGNullWindowID,
-                .bestResolution
-            )
-            hasAccess = testImage != nil
-        }
-
-        DispatchQueue.main.async { [weak self] in
-            if self?.isScreenRecordingGranted != hasAccess {
-                self?.isScreenRecordingGranted = hasAccess
+        SCShareableContent.getExcludingDesktopWindows(false, onScreenWindowsOnly: false) { [weak self] content, error in
+            let hasAccess = content != nil && error == nil
+            DispatchQueue.main.async {
+                if self?.isScreenRecordingGranted != hasAccess {
+                    self?.isScreenRecordingGranted = hasAccess
+                }
             }
         }
     }
@@ -101,47 +89,24 @@ final class PermissionManager: ObservableObject {
 
     /// Request screen recording permission
     func requestScreenRecordingPermission() {
-        // Open System Settings to Screen Recording via AppleScript
-        let script = """
-            tell application "System Settings"
-                activate
-                reveal anchor "Privacy_ScreenCapture" of pane id "com.apple.settings.PrivacySecurity.extension"
-            end tell
-            """
-        if let appleScript = NSAppleScript(source: script) {
-            var error: NSDictionary?
-            appleScript.executeAndReturnError(&error)
-            if error != nil {
-                let fallback = """
-                    tell application "System Settings"
-                        activate
-                        reveal anchor "Privacy_ScreenCapture" of pane id "com.apple.settings.PrivacySecurity"
-                    end tell
-                    """
-                NSAppleScript(source: fallback)?.executeAndReturnError(nil)
-            }
+        // Open System Settings to Screen & System Audio Recording via URL scheme.
+        // This doesn't require the apple-events entitlement (unlike AppleScript).
+        if let url = URL(string: "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_ScreenCapture") {
+            NSWorkspace.shared.open(url)
         }
 
         // Also trigger the system prompt
         CGRequestScreenCaptureAccess()
     }
 
-    /// Reset stale accessibility entry and re-prompt
+    /// Reset bypass flag and re-prompt for accessibility
     func resetAndRequestAccessibility() {
-        // Remove any stale entry for this bundle ID so the system prompt works cleanly
-        let task = Process()
-        task.launchPath = "/usr/bin/tccutil"
-        task.arguments = ["reset", "Accessibility", "com.dodoshot.app"]
-        try? task.run()
-        task.waitUntilExit()
-
-        // Clear the bypass flag
+        // Clear the bypass flag so we re-check properly
         UserDefaults.standard.removeObject(forKey: "accessibilityBypassed")
 
-        // Small delay to let TCC database update, then prompt
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.requestAccessibilityPermission()
-        }
+        // Note: tccutil reset requires admin privileges on macOS Sonoma+ and
+        // silently fails without them, so we skip it and just re-prompt.
+        requestAccessibilityPermission()
     }
 
     /// Request accessibility permission
@@ -169,11 +134,9 @@ final class PermissionManager: ObservableObject {
     func openAccessibilitySettings() {
         // System Settings doesn't reliably navigate between Privacy sub-panes
         // when already open (e.g. stuck on Screen Recording from step 1).
-        // Quit it first, then reopen at the Accessibility pane.
-        let quitScript = """
-            tell application "System Settings" to quit
-            """
-        NSAppleScript(source: quitScript)?.executeAndReturnError(nil)
+        // Kill it first, then reopen at the Accessibility pane.
+        NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.systempreferences")
+            .forEach { $0.terminate() }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             if let url = URL(string: "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility") {
