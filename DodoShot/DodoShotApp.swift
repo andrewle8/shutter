@@ -17,7 +17,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var popover: NSPopover!
     private var captureService: ScreenCaptureService!
     private var hotkeyManager: HotkeyManager!
-    private var settingsWindow: NSWindow?
     private var permissionCheckTimer: Timer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -253,23 +252,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             popover.performClose(nil)
         }
 
-        // Create or show settings window
-        if settingsWindow == nil {
-            let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 520, height: 420),
-                styleMask: [.titled, .closable],
-                backing: .buffered,
-                defer: false
-            )
-            window.title = "DodoShot Settings"
-            window.center()
-            window.isReleasedWhenClosed = false
-            window.contentView = NSHostingView(rootView: SettingsView())
-            settingsWindow = window
-        }
-
-        settingsWindow?.makeKeyAndOrderFront(nil)
+        // Open the native SwiftUI Settings scene (macOS 13+)
         NSApp.activate(ignoringOtherApps: true)
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
     }
 
     @objc private func quitApp() {
