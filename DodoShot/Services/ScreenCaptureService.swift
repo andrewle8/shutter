@@ -565,72 +565,93 @@ class ScreenCaptureService: ObservableObject {
     }
 
     private func captureArea(rect: CGRect, screen: NSScreen) {
-        lastCaptureRect = rect
-        lastCaptureScreen = screen
+        // Check if we have a frozen image to crop from
+        let frozenImage = frozenScreenImages[screen]
 
         // Hide all capture windows first
         for window in captureWindows {
             window.orderOut(nil)
         }
 
-        // Small delay to ensure windows are hidden before capture
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
-            guard let self = self else { return }
+        // Round the rect to integer values to avoid fractional pixel issues
+        let roundedRect = CGRect(
+            x: round(rect.origin.x),
+            y: round(rect.origin.y),
+            width: round(rect.width),
+            height: round(rect.height)
+        )
 
-            // Log the input rect and screen info for debugging
+        // Save the rect and screen for re-capture
+        self.lastCaptureRect = roundedRect
+        self.lastCaptureScreen = screen
+
+        if let frozenImage = frozenImage {
+            // Frozen mode: crop directly from the pre-captured frozen image
+            NSLog("[ScreenCaptureService] captureArea (frozen) - input rect: %@, screen: %@",
+                  NSStringFromRect(rect), NSStringFromRect(screen.frame))
+
             let scaleFactor = screen.backingScaleFactor
-            NSLog("[ScreenCaptureService] captureArea - input rect: %@, screen: %@, scaleFactor: %.1f",
-                  NSStringFromRect(rect), NSStringFromRect(screen.frame), scaleFactor)
 
-            // Round the rect to integer values to avoid fractional pixel issues
-            let roundedRect = CGRect(
-                x: round(rect.origin.x),
-                y: round(rect.origin.y),
-                width: round(rect.width),
-                height: round(rect.height)
+            // Convert point-based rect to pixel-based rect for cropping the CGImage
+            let cropRect = CGRect(
+                x: roundedRect.origin.x * scaleFactor,
+                y: roundedRect.origin.y * scaleFactor,
+                width: roundedRect.width * scaleFactor,
+                height: roundedRect.height * scaleFactor
             )
 
-            // The rect from SwiftUI is in the window's coordinate space where:
-            // - Origin (0,0) is at TOP-LEFT of the window
-            // - Y increases downward
-            //
-            // CGWindowListCreateImage expects global display coordinates where:
-            // - Origin (0,0) is at TOP-LEFT of the main display
-            // - Y increases downward
-            //
-            // Since our capture window covers the entire screen starting at screen.frame.origin,
-            // we just need to add the screen's origin to convert to global coordinates.
-            // No Y-flip needed because both coordinate systems have Y increasing downward.
-            let screenRect = CGRect(
-                x: roundedRect.origin.x + screen.frame.origin.x,
-                y: roundedRect.origin.y + screen.frame.origin.y,
-                width: roundedRect.width,
-                height: roundedRect.height
-            )
-
-            NSLog("[ScreenCaptureService] captureArea - screenRect for capture: %@", NSStringFromRect(screenRect))
-
-            // Use CGWindowListCreateImage for capture
-            guard let cgImage = CGWindowListCreateImage(
-                screenRect,
-                .optionOnScreenBelowWindow,
-                kCGNullWindowID,
-                [.bestResolution]
-            ) else {
-                NSLog("[ScreenCaptureService] captureArea - CGWindowListCreateImage failed")
-                self.isCapturing = false
-                self.closeCaptureWindows()
+            guard let croppedCGImage = frozenImage.cropping(to: cropRect) else {
+                NSLog("[ScreenCaptureService] captureArea (frozen) - cropping failed")
+                isCapturing = false
+                closeCaptureWindows()
+                frozenScreenImages.removeAll()
                 return
             }
 
-            NSLog("[ScreenCaptureService] captureArea - cgImage size: %d x %d, expected points: %.0f x %.0f",
-                  cgImage.width, cgImage.height, roundedRect.width, roundedRect.height)
+            NSLog("[ScreenCaptureService] captureArea (frozen) - cropped size: %d x %d, expected points: %.0f x %.0f",
+                  croppedCGImage.width, croppedCGImage.height, roundedRect.width, roundedRect.height)
 
-            // Create NSImage with the rounded rect size (in points)
-            // The cgImage contains high-res pixels, NSImage size is in points
-            let nsImage = NSImage(cgImage: cgImage, size: roundedRect.size)
-            self.closeCaptureWindows()
-            self.completeCapture(image: nsImage, type: .area)
+            let nsImage = NSImage(cgImage: croppedCGImage, size: roundedRect.size)
+            closeCaptureWindows()
+            frozenScreenImages.removeAll()
+            completeCapture(image: nsImage, type: .area)
+        } else {
+            // Live mode: capture from screen after hiding overlay windows
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+                guard let self = self else { return }
+
+                let scaleFactor = screen.backingScaleFactor
+                NSLog("[ScreenCaptureService] captureArea - input rect: %@, screen: %@, scaleFactor: %.1f",
+                      NSStringFromRect(rect), NSStringFromRect(screen.frame), scaleFactor)
+
+                let screenRect = CGRect(
+                    x: roundedRect.origin.x + screen.frame.origin.x,
+                    y: roundedRect.origin.y + screen.frame.origin.y,
+                    width: roundedRect.width,
+                    height: roundedRect.height
+                )
+
+                NSLog("[ScreenCaptureService] captureArea - screenRect for capture: %@", NSStringFromRect(screenRect))
+
+                guard let cgImage = CGWindowListCreateImage(
+                    screenRect,
+                    .optionOnScreenBelowWindow,
+                    kCGNullWindowID,
+                    [.bestResolution]
+                ) else {
+                    NSLog("[ScreenCaptureService] captureArea - CGWindowListCreateImage failed")
+                    self.isCapturing = false
+                    self.closeCaptureWindows()
+                    return
+                }
+
+                NSLog("[ScreenCaptureService] captureArea - cgImage size: %d x %d, expected points: %.0f x %.0f",
+                      cgImage.width, cgImage.height, roundedRect.width, roundedRect.height)
+
+                let nsImage = NSImage(cgImage: cgImage, size: roundedRect.size)
+                self.closeCaptureWindows()
+                self.completeCapture(image: nsImage, type: .area)
+            }
         }
     }
 
@@ -679,11 +700,17 @@ class ScreenCaptureService: ObservableObject {
     private func captureWindow(_ windowInfo: WindowInfo) {
         closeCaptureWindows()
 
+        let includeShadow = SettingsManager.shared.settings.captureWindowShadow
+        var imageOptions: CGWindowImageOption = [.bestResolution]
+        if !includeShadow {
+            imageOptions.insert(.boundsIgnoreFraming)
+        }
+
         guard let cgImage = CGWindowListCreateImage(
             windowInfo.frame,
             .optionIncludingWindow,
             windowInfo.windowID,
-            [.bestResolution, .boundsIgnoreFraming]
+            imageOptions
         ) else {
             isCapturing = false
             return
@@ -1075,6 +1102,7 @@ class ScreenCaptureService: ObservableObject {
 
     private func cancelCapture() {
         closeCaptureWindows()
+        frozenScreenImages.removeAll()
         isCapturing = false
     }
 

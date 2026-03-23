@@ -167,6 +167,26 @@ struct GeneralSettingsTab: View {
                             description: L10n.Settings.hideDesktopIconsDescription,
                             isOn: $settingsManager.settings.hideDesktopIcons
                         )
+
+                        Divider()
+                            .padding(.horizontal, -16)
+
+                        SettingsToggleRow(
+                            icon: "camera.metering.spot",
+                            title: L10n.Settings.freezeScreen,
+                            description: L10n.Settings.freezeScreenDescription,
+                            isOn: $settingsManager.settings.freezeScreenBeforeCapture
+                        )
+
+                        Divider()
+                            .padding(.horizontal, -16)
+
+                        SettingsToggleRow(
+                            icon: "shadow",
+                            title: L10n.Settings.captureWindowShadow,
+                            description: "settings.captureWindowShadow.description".localized,
+                            isOn: $settingsManager.settings.captureWindowShadow
+                        )
                     }
                 }
 
@@ -643,6 +663,61 @@ struct HotkeysSettingsTab: View {
                             iconColor: .indigo,
                             hotkey: $settingsManager.settings.hotkeys.activeWindowCapture,
                             hasConflict: HotkeyManager.shared.conflictingHotkeys.contains(settingsManager.settings.hotkeys.activeWindowCapture)
+                        )
+
+                        Divider()
+                            .padding(.vertical, 12)
+
+                        HotkeyRow(
+                            label: L10n.Settings.unifiedCapture,
+                            icon: "rectangle.and.hand.point.up.left.filled",
+                            iconColor: .orange,
+                            hotkey: $settingsManager.settings.hotkeys.unifiedCapture,
+                            hasConflict: HotkeyManager.shared.conflictingHotkeys.contains(settingsManager.settings.hotkeys.unifiedCapture)
+                        )
+
+                        Divider()
+                            .padding(.vertical, 12)
+
+                        HotkeyRow(
+                            label: L10n.Settings.captureError,
+                            icon: "exclamationmark.triangle",
+                            iconColor: .red,
+                            hotkey: $settingsManager.settings.hotkeys.captureError,
+                            hasConflict: HotkeyManager.shared.conflictingHotkeys.contains(settingsManager.settings.hotkeys.captureError)
+                        )
+
+                        Divider()
+                            .padding(.vertical, 12)
+
+                        HotkeyRow(
+                            label: L10n.Settings.captureForClaude,
+                            icon: "brain.head.profile",
+                            iconColor: .purple,
+                            hotkey: $settingsManager.settings.hotkeys.captureForClaude,
+                            hasConflict: HotkeyManager.shared.conflictingHotkeys.contains(settingsManager.settings.hotkeys.captureForClaude)
+                        )
+
+                        Divider()
+                            .padding(.vertical, 12)
+
+                        HotkeyRow(
+                            label: L10n.Settings.captureCode,
+                            icon: "chevron.left.forwardslash.chevron.right",
+                            iconColor: .green,
+                            hotkey: $settingsManager.settings.hotkeys.captureCode,
+                            hasConflict: HotkeyManager.shared.conflictingHotkeys.contains(settingsManager.settings.hotkeys.captureCode)
+                        )
+
+                        Divider()
+                            .padding(.vertical, 12)
+
+                        HotkeyRow(
+                            label: L10n.Settings.recaptureLastArea,
+                            icon: "arrow.counterclockwise.circle",
+                            iconColor: .teal,
+                            hotkey: $settingsManager.settings.hotkeys.recaptureLastArea,
+                            hasConflict: HotkeyManager.shared.conflictingHotkeys.contains(settingsManager.settings.hotkeys.recaptureLastArea)
                         )
                     }
                 }
