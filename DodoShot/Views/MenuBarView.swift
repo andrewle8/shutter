@@ -25,7 +25,7 @@ struct MenuBarView: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "chevron.left")
                                     .font(.system(size: 11, weight: .semibold))
-                                Text("Back")
+                                Text(L10n.Menu.back)
                                     .font(.system(size: 12, weight: .medium))
                             }
                             .foregroundColor(.secondary)
@@ -34,7 +34,7 @@ struct MenuBarView: View {
 
                         Spacer()
 
-                        Text("Settings")
+                        Text(L10n.Menu.settings)
                             .font(.system(size: 13, weight: .semibold))
 
                         Spacer()
@@ -88,7 +88,7 @@ struct MenuBarView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.white)
 
-                Text(permissionManager.allPermissionsGranted ? "Ready" : "menu.ready".localized)
+                Text("menu.ready".localized)
                     .font(.system(size: 10, weight: .medium))
                     .foregroundColor(permissionManager.allPermissionsGranted ? Darkroom.accent : .secondary)
             }
@@ -185,14 +185,14 @@ struct MenuBarView: View {
 
             HStack(spacing: 16) {
                 Toggle(isOn: $settingsManager.settings.autoCopyToClipboard) {
-                    Text("Auto-copy")
+                    Text(L10n.Menu.autoCopyToggle)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.secondary)
                 }
                 .toggleStyle(DarkroomToggleStyle())
 
                 Toggle(isOn: $settingsManager.settings.hideDesktopIcons) {
-                    Text("Hide desktop")
+                    Text(L10n.Menu.hideDesktop)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.secondary)
                 }

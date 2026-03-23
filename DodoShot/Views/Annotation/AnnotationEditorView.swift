@@ -680,7 +680,7 @@ struct AnnotationEditorView: View {
             VStack(alignment: .leading, spacing: 20) {
                 // Header
                 HStack {
-                    Text("Backdrop")
+                    Text(L10n.Annotation.backdrop)
                         .font(.system(size: 15, weight: .semibold))
                     Spacer()
                     Toggle("", isOn: $backdropEnabled)
@@ -691,7 +691,7 @@ struct AnnotationEditorView: View {
                 if backdropEnabled {
                     // Backdrop Type
                     HStack {
-                        Text("Type")
+                        Text(L10n.Annotation.BackdropLabels.type)
                             .font(.system(size: 12, weight: .medium))
                             .foregroundColor(.secondary)
                         Spacer()
@@ -719,7 +719,7 @@ struct AnnotationEditorView: View {
                     // Shadow
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Text("Shadow")
+                            Text(L10n.Annotation.BackdropLabels.shadow)
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundColor(.secondary)
                             Spacer()
@@ -730,9 +730,9 @@ struct AnnotationEditorView: View {
 
                         if shadowEnabled {
                             VStack(spacing: 12) {
-                                SliderRow(label: "Blur", value: $shadowBlur, range: 0...50)
-                                SliderRow(label: "Offset", value: $shadowOffset, range: 0...30)
-                                SliderRow(label: "Opacity", value: $shadowOpacity, range: 0...1, format: "%.0f%%", multiplier: 100)
+                                SliderRow(label: L10n.Annotation.BackdropLabels.blurAmount, value: $shadowBlur, range: 0...50)
+                                SliderRow(label: L10n.Annotation.BackdropLabels.offset, value: $shadowOffset, range: 0...30)
+                                SliderRow(label: L10n.Annotation.BackdropLabels.opacity, value: $shadowOpacity, range: 0...1, format: "%.0f%%", multiplier: 100)
                             }
                         }
                     }
@@ -741,12 +741,12 @@ struct AnnotationEditorView: View {
 
                     // Border Radius
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Border radius")
+                        Text(L10n.Annotation.BackdropLabels.borderRadius)
                             .font(.system(size: 12, weight: .medium))
                             .foregroundColor(.secondary)
 
-                        SliderRow(label: "Inner", value: $innerRadius, range: 0...50)
-                        SliderRow(label: "Outer", value: $outerRadius, range: 0...50)
+                        SliderRow(label: L10n.Annotation.BackdropLabels.inner, value: $innerRadius, range: 0...50)
+                        SliderRow(label: L10n.Annotation.BackdropLabels.outer, value: $outerRadius, range: 0...50)
                     }
                 }
             }
@@ -759,7 +759,7 @@ struct AnnotationEditorView: View {
     // MARK: - Solid Color Picker
     private var solidColorPicker: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Solid colors")
+            Text(L10n.Annotation.BackdropLabels.solidColors)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(.secondary)
 
@@ -786,7 +786,7 @@ struct AnnotationEditorView: View {
         VStack(alignment: .leading, spacing: 12) {
             // Direction toggle
             HStack {
-                Text("Direction")
+                Text(L10n.Annotation.BackdropLabels.direction)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.secondary)
                 Spacer()
@@ -807,7 +807,7 @@ struct AnnotationEditorView: View {
                 }
             }
 
-            Text("Gradients")
+            Text(L10n.Annotation.BackdropLabels.gradients)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(.secondary)
 
@@ -906,7 +906,7 @@ struct AnnotationEditorView: View {
                         .lineLimit(4)
 
                     if !aiDescriptionIsError {
-                        Text("Copied to clipboard")
+                        Text(L10n.Annotation.copiedToClipboard)
                             .font(.system(size: 10))
                             .foregroundColor(.purple.opacity(0.8))
                             .padding(.top, 2)
@@ -1199,7 +1199,7 @@ struct AnnotationEditorView: View {
 
                 ToolbarActionButton(
                     icon: "arrow.uturn.forward",
-                    label: "Redo",
+                    label: L10n.Annotation.redo,
                     isDisabled: redoStack.isEmpty,
                     action: redo
                 )
@@ -1222,7 +1222,7 @@ struct AnnotationEditorView: View {
                 HStack(spacing: 4) {
                     ToolbarActionButton(
                         icon: "square.3.layers.3d.down.left",
-                        label: "Back",
+                        label: L10n.Annotation.back,
                         isDisabled: false,
                         action: sendToBack
                     )
@@ -1243,7 +1243,7 @@ struct AnnotationEditorView: View {
 
                     ToolbarActionButton(
                         icon: "square.3.layers.3d.down.right",
-                        label: "Front",
+                        label: L10n.Annotation.front,
                         isDisabled: false,
                         action: bringToFront
                     )
@@ -1310,7 +1310,7 @@ struct AnnotationEditorView: View {
                             Image(systemName: "text.viewfinder")
                                 .font(.system(size: 10, weight: .medium))
                         }
-                        Text("OCR")
+                        Text(L10n.Annotation.ocr)
                             .font(.system(size: 11, weight: .medium))
                     }
                     .foregroundColor(.primary)
@@ -1337,7 +1337,7 @@ struct AnnotationEditorView: View {
                                 Image(systemName: "sparkles")
                                     .font(.system(size: 10, weight: .medium))
                             }
-                            Text("Describe")
+                            Text(L10n.Annotation.describe)
                                 .font(.system(size: 11, weight: .medium))
                         }
                         .foregroundColor(.primary)
@@ -1375,7 +1375,7 @@ struct AnnotationEditorView: View {
                     HStack(spacing: 5) {
                         Image(systemName: "doc.badge.plus")
                             .font(.system(size: 10, weight: .medium))
-                        Text("Save project")
+                        Text(L10n.Annotation.saveProject)
                             .font(.system(size: 11, weight: .medium))
                     }
                     .foregroundColor(.primary)
@@ -3261,21 +3261,21 @@ class AnnotationCanvasNSView: NSView, NSTextFieldDelegate {
         // Build context menu
         let menu = NSMenu()
 
-        let deleteItem = NSMenuItem(title: "Delete", action: #selector(contextMenuDelete), keyEquivalent: "")
+        let deleteItem = NSMenuItem(title: L10n.Annotation.delete, action: #selector(contextMenuDelete), keyEquivalent: "")
         deleteItem.target = self
         menu.addItem(deleteItem)
 
-        let duplicateItem = NSMenuItem(title: "Duplicate", action: #selector(contextMenuDuplicate), keyEquivalent: "")
+        let duplicateItem = NSMenuItem(title: L10n.Annotation.duplicate, action: #selector(contextMenuDuplicate), keyEquivalent: "")
         duplicateItem.target = self
         menu.addItem(duplicateItem)
 
         menu.addItem(NSMenuItem.separator())
 
-        let frontItem = NSMenuItem(title: "Bring to Front", action: #selector(contextMenuBringToFront), keyEquivalent: "")
+        let frontItem = NSMenuItem(title: L10n.Annotation.bringToFront, action: #selector(contextMenuBringToFront), keyEquivalent: "")
         frontItem.target = self
         menu.addItem(frontItem)
 
-        let backItem = NSMenuItem(title: "Send to Back", action: #selector(contextMenuSendToBack), keyEquivalent: "")
+        let backItem = NSMenuItem(title: L10n.Annotation.sendToBack, action: #selector(contextMenuSendToBack), keyEquivalent: "")
         backItem.target = self
         menu.addItem(backItem)
 

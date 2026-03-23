@@ -66,13 +66,13 @@ struct GeneralSettingsTab: View {
                 // Startup Section
                 SettingsSection(
                     icon: "power",
-                    title: "Startup",
+                    title: L10n.Settings.startup,
                     iconColor: .green
                 ) {
                     SettingsToggleRow(
                         icon: "arrow.clockwise",
-                        title: "Launch at login",
-                        description: "Automatically start Lucida when you log in",
+                        title: L10n.Settings.launchAtLogin,
+                        description: L10n.Settings.launchAtLoginDescription,
                         isOn: Binding(
                             get: { settingsManager.settings.launchAtStartup },
                             set: { newValue in
@@ -84,8 +84,8 @@ struct GeneralSettingsTab: View {
 
                     SettingsToggleRow(
                         icon: "dock.rectangle",
-                        title: "Show in Dock",
-                        description: "Show Lucida in the Dock and Cmd-Tab switcher. Changes apply on next launch.",
+                        title: L10n.Settings.showInDock,
+                        description: L10n.Settings.showInDockDescription,
                         isOn: Binding(
                             get: { settingsManager.settings.showInDock },
                             set: { newValue in
@@ -98,13 +98,13 @@ struct GeneralSettingsTab: View {
                 // Privacy Section
                 SettingsSection(
                     icon: "hand.raised",
-                    title: "Privacy",
+                    title: L10n.Settings.privacy,
                     iconColor: .blue
                 ) {
                     SettingsToggleRow(
                         icon: "clock.arrow.circlepath",
-                        title: "Save capture history",
-                        description: "Keep recent captures in memory for quick access",
+                        title: L10n.Settings.saveHistory,
+                        description: L10n.Settings.saveHistoryDescription,
                         isOn: Binding(
                             get: { settingsManager.settings.saveHistory },
                             set: { newValue in
@@ -193,11 +193,11 @@ struct GeneralSettingsTab: View {
                 // OCR Section
                 SettingsSection(
                     icon: "text.viewfinder",
-                    title: "OCR / Text Extraction",
+                    title: L10n.Settings.ocrSection,
                     iconColor: .cyan
                 ) {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Output format")
+                        Text(L10n.Settings.ocrOutputFormat)
                             .font(.system(size: 13, weight: .medium))
 
                         HStack(spacing: 8) {
@@ -270,7 +270,7 @@ struct GeneralSettingsTab: View {
 
                         // Image format
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Image format")
+                            Text(L10n.Settings.imageFormat)
                                 .font(.system(size: 13, weight: .medium))
 
                             HStack(spacing: 8) {
@@ -285,7 +285,7 @@ struct GeneralSettingsTab: View {
                             }
 
                             if settingsManager.settings.imageFormat == .auto {
-                                Text("Automatically selects PNG for screenshots with text/UI, JPG for photos")
+                                Text(L10n.Settings.imageFormatAuto)
                                     .font(.system(size: 11))
                                     .foregroundColor(.secondary)
                             }
@@ -297,7 +297,7 @@ struct GeneralSettingsTab: View {
 
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack {
-                                    Text("JPG quality")
+                                    Text(L10n.Settings.jpgQuality)
                                         .font(.system(size: 13, weight: .medium))
                                     Spacer()
                                     Text("\(Int(settingsManager.settings.jpgQuality * 100))%")
@@ -309,11 +309,11 @@ struct GeneralSettingsTab: View {
                                     .tint(.orange)
 
                                 HStack {
-                                    Text("Smaller file")
+                                    Text(L10n.Settings.jpgQualitySmaller)
                                         .font(.system(size: 10))
                                         .foregroundColor(.secondary)
                                     Spacer()
-                                    Text("Better quality")
+                                    Text(L10n.Settings.jpgQualityBetter)
                                         .font(.system(size: 10))
                                         .foregroundColor(.secondary)
                                 }
@@ -329,11 +329,11 @@ struct GeneralSettingsTab: View {
     private func ocrFormatDescription(_ format: OCROutputFormat) -> String {
         switch format {
         case .auto:
-            return "Detects code, tables, lists, and errors automatically. Wraps code in fenced blocks with language tags."
+            return L10n.Settings.ocrFormatAuto
         case .markdown:
-            return "Always formats as Markdown. Code becomes fenced blocks, aligned text becomes tables."
+            return L10n.Settings.ocrFormatMarkdown
         case .plain:
-            return "Raw text output with no formatting. Preserves indentation from layout analysis."
+            return L10n.Settings.ocrFormatPlain
         }
     }
 
@@ -984,12 +984,12 @@ struct AISettingsTab: View {
                                     Image(systemName: "checkmark.circle.fill")
                                         .font(.system(size: 12))
                                         .foregroundColor(.green)
-                                    Text("Uses on-device AI. No API key required.")
+                                    Text(L10n.Settings.aiOnDevice)
                                         .font(.system(size: 12, weight: .medium))
                                         .foregroundColor(.secondary)
                                 }
 
-                                Text("Descriptions are generated locally using Apple Intelligence. Processing is private and free.")
+                                Text(L10n.Settings.aiOnDeviceDescription)
                                     .font(.system(size: 11))
                                     .foregroundColor(.secondary.opacity(0.8))
                                     .fixedSize(horizontal: false, vertical: true)
@@ -1281,7 +1281,7 @@ struct AboutTab: View {
             Spacer()
 
             // Footer - Made by Andrew Le
-            Text("Made by Andrew Le")
+            Text(L10n.Settings.madeBy)
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(.secondary)
         }
@@ -1310,9 +1310,9 @@ struct OCRLLMCleanupSection: View {
             HStack {
                 Toggle(isOn: $settingsManager.settings.ocrLLMCleanup) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("LLM cleanup")
+                        Text(L10n.Settings.llmCleanup)
                             .font(.system(size: 13, weight: .medium))
-                        Text("Uses local Ollama model to fix OCR errors and improve formatting")
+                        Text(L10n.Settings.llmCleanupDescription)
                             .font(.system(size: 11))
                             .foregroundColor(.secondary)
                     }
@@ -1327,7 +1327,7 @@ struct OCRLLMCleanupSection: View {
                     Circle()
                         .fill(ollamaAvailable ? Color.green : Color.red)
                         .frame(width: 7, height: 7)
-                    Text(ollamaAvailable ? "Ollama running" : "Ollama offline")
+                    Text(ollamaAvailable ? L10n.Settings.llmCleanupOllamaRunning : L10n.Settings.llmCleanupOllamaOffline)
                         .font(.system(size: 10))
                         .foregroundColor(.secondary)
                 }
@@ -1336,12 +1336,12 @@ struct OCRLLMCleanupSection: View {
             // Model picker (only when enabled)
             if settingsManager.settings.ocrLLMCleanup {
                 HStack {
-                    Text("Model")
+                    Text(L10n.Settings.llmCleanupModel)
                         .font(.system(size: 12))
                         .foregroundColor(.secondary)
 
                     if availableModels.isEmpty {
-                        TextField("Model name", text: $settingsManager.settings.ocrCleanupModel)
+                        TextField(L10n.Settings.llmCleanupModelName, text: $settingsManager.settings.ocrCleanupModel)
                             .textFieldStyle(.roundedBorder)
                             .font(.system(size: 12))
                             .frame(maxWidth: 200)

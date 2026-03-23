@@ -512,7 +512,7 @@ struct CompactOverlayView: View {
                 Divider()
                     .padding(.horizontal, 4)
                 HStack(spacing: 6) {
-                    Text("Backdrop")
+                    Text(L10n.Overlay.backdrop)
                         .font(.system(size: 10, weight: .medium))
                         .foregroundColor(.secondary)
                     Spacer()
@@ -900,7 +900,7 @@ struct CopiedBadge: View {
         HStack(spacing: 5) {
             Image(systemName: "checkmark")
                 .font(.system(size: 11, weight: .bold))
-            Text("overlay.copied".localized)
+            Text(L10n.Overlay.copied)
                 .font(.system(size: 11, weight: .semibold))
         }
         .foregroundColor(.white)

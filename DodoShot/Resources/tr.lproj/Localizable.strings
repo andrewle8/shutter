@@ -3,6 +3,9 @@
   Lucida - Turkish (Türkçe)
 */
 
+// MARK: - App
+"app.failedToOpenProject" = "Proje açılamadı";
+
 // MARK: - Menu Bar
 "menu.capture" = "Yakala";
 "menu.area" = "Alan";
@@ -18,20 +21,23 @@
 "menu.noRecentCaptures" = "Son yakalama yok";
 "menu.showAll" = "Tümünü Göster";
 "menu.settings" = "Ayarlar";
-"menu.quit" = "Lucida'tan Çık";
+"menu.quit" = "Lucida'dan Çık";
 "menu.history" = "Geçmiş";
 "menu.paste" = "Yapıştır";
 "menu.ocrPaste" = "OCR Paste";
 "menu.captureError" = "Hata yakala";
 "menu.captureForClaude" = "Claude için yakala";
 "menu.captureCode" = "Kod yakala";
-"menu.smartCapture" = "Akilli yakalama";
+"menu.smartCapture" = "Akıllı yakalama";
 "menu.selectScreen" = "Ekran seç";
 "menu.allScreens" = "Tüm Ekranlar";
 "menu.mainScreen" = "Ana";
 "menu.ready" = "Yakalamaya hazır";
 "menu.scrolling.description" = "Uzun sayfaları yakala";
 "menu.clearHistory" = "Geçmişi temizle";
+"menu.back" = "Geri";
+"menu.autoCopy" = "Otomatik kopyala";
+"menu.hideDesktop" = "Masaüstünü gizle";
 
 // MARK: - Capture Types
 "capture.area" = "Alan";
@@ -47,6 +53,7 @@
 "overlay.close" = "Kapat";
 "overlay.justNow" = "Az önce";
 "overlay.copied" = "Kopyalandı";
+"overlay.backdrop" = "Arka plan";
 "overlay.backdrop.none" = "Yok";
 "overlay.backdrop.white" = "Beyaz";
 "overlay.backdrop.dark" = "Koyu";
@@ -63,6 +70,7 @@
 "annotation.highlight" = "Vurgula";
 "annotation.freehand" = "Serbest Çizim";
 "annotation.undo" = "Geri Al";
+"annotation.redo" = "Yinele";
 "annotation.clear" = "Temizle";
 "annotation.cancel" = "İptal";
 "annotation.addText" = "Metin ekle";
@@ -70,6 +78,28 @@
 "annotation.textPlaceholder" = "Metninizi yazın...";
 "annotation.annotations" = "%d açıklama";
 "annotation.annotationsPlural" = "%d açıklama";
+"annotation.copiedToClipboard" = "Panoya kopyalandı";
+"annotation.back" = "Arkaya";
+"annotation.front" = "Öne";
+"annotation.ocr" = "OCR";
+"annotation.describe" = "Açıkla";
+"annotation.saveProject" = "Projeyi kaydet";
+"annotation.delete" = "Sil";
+"annotation.duplicate" = "Çoğalt";
+"annotation.bringToFront" = "Öne Getir";
+"annotation.sendToBack" = "Arkaya Gönder";
+"annotation.backdrop" = "Arka plan";
+"annotation.backdrop.type" = "Tür";
+"annotation.backdrop.shadow" = "Gölge";
+"annotation.backdrop.blur" = "Bulanıklık";
+"annotation.backdrop.offset" = "Kaydırma";
+"annotation.backdrop.opacity" = "Saydamlık";
+"annotation.backdrop.borderRadius" = "Köşe yarıçapı";
+"annotation.backdrop.inner" = "İç";
+"annotation.backdrop.outer" = "Dış";
+"annotation.backdrop.solidColors" = "Düz renkler";
+"annotation.backdrop.direction" = "Yön";
+"annotation.backdrop.gradients" = "Gradyanlar";
 
 // MARK: - Settings
 "settings.title" = "Ayarlar";
@@ -78,9 +108,21 @@
 "settings.ai" = "Yapay Zeka";
 "settings.about" = "Hakkında";
 
+// Settings - Startup
+"settings.startup" = "Başlangıç";
+"settings.launchAtLogin" = "Oturum açılınca başlat";
+"settings.launchAtLogin.description" = "Oturum açılınca Lucida'yı otomatik başlat";
+"settings.showInDock" = "Dock'ta göster";
+"settings.showInDock.description" = "Lucida'yı Dock'ta ve Cmd-Tab değiştiricisinde göster. Değişiklikler sonraki başlatmada uygulanır.";
+
+// Settings - Privacy
+"settings.privacy" = "Gizlilik";
+"settings.saveHistory" = "Yakalama geçmişini kaydet";
+"settings.saveHistory.description" = "Hızlı erişim için son yakalamaları bellekte tut";
+
 // Settings - General
 "settings.appearance" = "Görünüm";
-"settings.appearance.description" = "Lucida'un nasıl görüneceğini seçin";
+"settings.appearance.description" = "Lucida'nın nasıl görüneceğini seçin";
 "settings.appearance.system" = "Sistem";
 "settings.appearance.light" = "Açık";
 "settings.appearance.dark" = "Koyu";
@@ -93,11 +135,25 @@
 "settings.hideDesktopIcons.description" = "Tam ekran yakalama sırasında simgeleri geçici olarak gizle";
 "settings.freezeScreen" = "Yakalamadan önce ekranı dondur";
 "settings.freezeScreen.description" = "Seçim gösterilmeden önce ekran içeriğini yakala, araç ipuçlarını ve menüleri koru";
-"settings.captureWindowShadow" = "Pencere golgesini dahil et";
-"settings.captureWindowShadow.description" = "Pencere yakalamalarinda pencere golgesini dahil et";
+"settings.captureWindowShadow" = "Pencere gölgesini dahil et";
+"settings.captureWindowShadow.description" = "Pencere yakalamalarında pencere gölgesini dahil et";
 "settings.storage" = "Depolama";
 "settings.saveLocation" = "Kayıt konumu";
 "settings.choose" = "Seç";
+
+// Settings - OCR
+"settings.ocrSection" = "OCR / Metin Çıkarma";
+"settings.ocrOutputFormat" = "Çıktı formatı";
+"settings.ocrFormat.auto" = "Kodu, tabloları, listeleri ve hataları otomatik algılar. Kodu dil etiketleriyle bloklar içine alır.";
+"settings.ocrFormat.markdown" = "Her zaman Markdown olarak biçimlendirir. Kod bloklara, hizalı metin tablolara dönüşür.";
+"settings.ocrFormat.plain" = "Biçimlendirmesiz düz metin çıktısı. Düzen analizinden girinti korunur.";
+
+// Settings - Image Format
+"settings.imageFormat" = "Görüntü formatı";
+"settings.imageFormat.auto" = "Metin/UI ekran görüntüleri için PNG, fotoğraflar için JPG otomatik seçer";
+"settings.jpgQuality" = "JPG kalitesi";
+"settings.jpgQuality.smaller" = "Daha küçük dosya";
+"settings.jpgQuality.better" = "Daha iyi kalite";
 
 // Settings - Hotkeys
 "settings.shortcuts" = "Klavye kısayolları";
@@ -117,11 +173,11 @@
 "settings.captureError" = "Hata metnini yakala";
 "settings.captureForClaude" = "Claude için yakala";
 "settings.captureCode" = "Kod bloğu yakala";
-"settings.recaptureLastArea" = "Son alani yeniden yakala";
-"settings.smartCapture" = "Akilli yakalama";
+"settings.recaptureLastArea" = "Son alanı yeniden yakala";
+"settings.smartCapture" = "Akıllı yakalama";
 "settings.recording" = "Kaydediliyor...";
 "settings.permissions" = "Erişilebilirlik izni gerekli";
-"settings.permissions.description" = "Lucida'un global kısayolları çalışması için erişilebilirlik izni gereklidir.";
+"settings.permissions.description" = "Lucida'nın global kısayolları çalışması için erişilebilirlik izni gereklidir.";
 "settings.openSettings" = "Ayarları aç";
 
 // Settings - AI
@@ -137,6 +193,16 @@
 "settings.ocrExtraction.description" = "Herhangi bir ekran görüntüsünden metin çıkar ve kopyala";
 "settings.contentSuggestions" = "İçerik önerileri";
 "settings.contentSuggestions.description" = "Açıklamalar ve düzenlemeler için akıllı öneriler al";
+"settings.ai.onDevice" = "Cihaz üzerinde yapay zeka kullanır. API anahtarı gerekmez.";
+"settings.ai.onDevice.description" = "Açıklamalar Apple Intelligence ile yerel olarak oluşturulur. İşleme gizli ve ücretsizdir.";
+
+// Settings - LLM Cleanup
+"settings.llmCleanup" = "LLM temizleme";
+"settings.llmCleanup.description" = "OCR hatalarını düzeltmek ve biçimlendirmeyi iyileştirmek için yerel Ollama modeli kullanır";
+"settings.llmCleanup.ollamaRunning" = "Ollama çalışıyor";
+"settings.llmCleanup.ollamaOffline" = "Ollama çevrimdışı";
+"settings.llmCleanup.model" = "Model";
+"settings.llmCleanup.modelName" = "Model adı";
 
 // Settings - About
 "settings.version" = "Sürüm %@";
@@ -144,6 +210,7 @@
 "settings.openSource" = "Açık Kaynak • MIT Lisansı";
 "settings.viewOnGitHub" = "GitHub'da Görüntüle";
 "settings.madeWith" = "macOS topluluğu için ♥ ile yapıldı";
+"settings.madeBy" = "Andrew Le tarafından yapıldı";
 
 // MARK: - Capture History
 "history.title" = "Yakalama Geçmişi";
@@ -162,7 +229,7 @@
 
 // MARK: - Permissions
 "permissions.title" = "İzinler Gerekli";
-"permissions.description" = "Lucida'un ekran görüntüsü alması ve global kısayolları kullanması için Ekran Kaydı ve Erişilebilirlik izinleri gereklidir.";
+"permissions.description" = "Lucida'nın ekran görüntüsü alması ve global kısayolları kullanması için Ekran Kaydı ve Erişilebilirlik izinleri gereklidir.";
 "permissions.screenRecording" = "Ekran Kaydı";
 "permissions.screenRecording.description" = "Ekran görüntüsü almak için gerekli";
 "permissions.accessibility" = "Erişilebilirlik";
@@ -173,9 +240,9 @@
 "permissions.restart" = "Yeniden Başlat";
 "permissions.later" = "Daha sonra yapacağım";
 "permissions.instructions" = "Zaten etkinse ancak çalışmıyorsa:";
-"permissions.step1" = "1. Lucida'u izin listesinden kaldırın";
+"permissions.step1" = "1. Lucida'yı izin listesinden kaldırın";
 "permissions.step2" = "2. \"Finder'da Göster\"e tıklayın ve uygulamayı geri sürükleyin";
-"permissions.step3" = "3. Lucida'u yeniden başlatın";
+"permissions.step3" = "3. Lucida'yı yeniden başlatın";
 
 // MARK: - Window Selection
 "windowSelection.title" = "Yakalanacak pencereyi seçin";
@@ -194,3 +261,58 @@
 "contextMenu.annotate" = "Düzenle";
 "contextMenu.pin" = "Ekrana Sabitle";
 "contextMenu.delete" = "Sil";
+"contextMenu.dark" = "Koyu";
+"contextMenu.light" = "Açık";
+"contextMenu.system" = "Sistem";
+"contextMenu.settings" = "Ayarlar...";
+"contextMenu.quit" = "Lucida'dan Çık";
+
+// MARK: - Floating Window
+"floating.clickThrough" = "Tıklama geçirgen";
+"floating.copied" = "Kopyalandı";
+
+// MARK: - Color Picker
+"colorPicker.pickedColor" = "Seçilen Renk";
+
+// MARK: - OCR
+"ocr.failed" = "OCR başarısız";
+"ocr.textCopied" = "Metin panoya kopyalandı";
+
+// MARK: - Timer
+"timer.selectDelay" = "Zamanlayıcı gecikmesini seç";
+"timer.seconds" = "sn";
+"timer.cancel" = "İptal";
+
+// MARK: - Screen Selection
+"screenSelection.cancel" = "İptal";
+"screenSelection.close" = "Kapat";
+
+// MARK: - Welcome HUD
+"welcome.ready" = "Lucida hazır";
+"welcome.description" = "Ekranınızdaki her şeyi yakalayın";
+"welcome.area" = "Alan";
+"welcome.autoPaste" = "Otomatik yapıştır";
+"welcome.ocrPaste" = "OCR Paste";
+"welcome.forClaude" = "Claude için";
+
+// MARK: - Smart Capture
+"smartCapture.paste" = "Yapıştır";
+"smartCapture.placeholder" = "Bağlam ekleyin veya OCR yapıştırmak için Enter'a basın...";
+
+// MARK: - Onboarding
+"onboarding.setup" = "Lucida kurulumu";
+"onboarding.screenRecording" = "Ekran kaydı";
+"onboarding.screenRecording.description" = "Lucida'nın ekran görüntüsü alabilmesi için ekran kaydı izni gereklidir.";
+"onboarding.openSystemSettings" = "Sistem ayarlarını aç";
+"onboarding.screenRecording.hint" = "Gizlilik ve Güvenlik → Ekran Kaydı bölümünde Lucida'yı etkinleştirin";
+"onboarding.screenRecording.restart" = "Etkinleştirdikten sonra değişikliklerin geçerli olması için Lucida'yı yeniden başlatın";
+"onboarding.accessibility" = "Erişilebilirlik";
+"onboarding.accessibility.description" = "Lucida'nın global klavye kısayolları için erişilebilirlik izni gereklidir.";
+"onboarding.grantAccessibility" = "Erişilebilirlik izni ver";
+"onboarding.openSettingsManually" = "Sistem ayarlarını manuel aç";
+"onboarding.accessibilityEnabled" = "Etkinleştirdim, devam et →";
+"onboarding.allSet" = "Her şey hazır!";
+"onboarding.allSet.description" = "Lucida kullanıma hazır. Ekran görüntüsü almak için menü çubuğu simgesine tıklayın veya klavye kısayollarını kullanın.";
+"onboarding.area" = "Alan";
+"onboarding.window" = "Pencere";
+"onboarding.fullscreen" = "Tam Ekran";

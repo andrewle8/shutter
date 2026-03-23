@@ -110,7 +110,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         } catch {
             print("Failed to open project: \(error)")
             let alert = NSAlert()
-            alert.messageText = "Failed to open project"
+            alert.messageText = L10n.App.failedToOpenProject
             alert.informativeText = error.localizedDescription
             alert.alertStyle = .warning
             alert.runModal()
@@ -154,9 +154,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         // Appearance submenu
         let appearanceMenu = NSMenu()
-        let darkItem = NSMenuItem(title: "Dark", action: #selector(setDarkMode), keyEquivalent: "")
-        let lightItem = NSMenuItem(title: "Light", action: #selector(setLightMode), keyEquivalent: "")
-        let systemItem = NSMenuItem(title: "System", action: #selector(setSystemMode), keyEquivalent: "")
+        let darkItem = NSMenuItem(title: L10n.ContextMenu.dark, action: #selector(setDarkMode), keyEquivalent: "")
+        let lightItem = NSMenuItem(title: L10n.ContextMenu.light, action: #selector(setLightMode), keyEquivalent: "")
+        let systemItem = NSMenuItem(title: L10n.ContextMenu.system, action: #selector(setSystemMode), keyEquivalent: "")
 
         // Mark current mode
         updateAppearanceMenuItems(darkItem: darkItem, lightItem: lightItem, systemItem: systemItem)
@@ -165,14 +165,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         appearanceMenu.addItem(lightItem)
         appearanceMenu.addItem(systemItem)
 
-        let appearanceMenuItem = NSMenuItem(title: "Appearance", action: nil, keyEquivalent: "")
+        let appearanceMenuItem = NSMenuItem(title: L10n.ContextMenu.appearance, action: nil, keyEquivalent: "")
         appearanceMenuItem.submenu = appearanceMenu
 
         menu.addItem(appearanceMenuItem)
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ","))
+        menu.addItem(NSMenuItem(title: L10n.ContextMenu.settings, action: #selector(openSettings), keyEquivalent: ","))
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "Quit Lucida", action: #selector(quitApp), keyEquivalent: "q"))
+        menu.addItem(NSMenuItem(title: L10n.ContextMenu.quit, action: #selector(quitApp), keyEquivalent: "q"))
 
         statusItem.menu = nil // We'll show it manually on right-click
     }
@@ -194,9 +194,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         // Appearance submenu
         let appearanceMenu = NSMenu()
-        let darkItem = NSMenuItem(title: "Dark", action: #selector(setDarkMode), keyEquivalent: "")
-        let lightItem = NSMenuItem(title: "Light", action: #selector(setLightMode), keyEquivalent: "")
-        let systemItem = NSMenuItem(title: "System", action: #selector(setSystemMode), keyEquivalent: "")
+        let darkItem = NSMenuItem(title: L10n.ContextMenu.dark, action: #selector(setDarkMode), keyEquivalent: "")
+        let lightItem = NSMenuItem(title: L10n.ContextMenu.light, action: #selector(setLightMode), keyEquivalent: "")
+        let systemItem = NSMenuItem(title: L10n.ContextMenu.system, action: #selector(setSystemMode), keyEquivalent: "")
 
         darkItem.target = self
         lightItem.target = self
@@ -209,19 +209,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         appearanceMenu.addItem(lightItem)
         appearanceMenu.addItem(systemItem)
 
-        let appearanceMenuItem = NSMenuItem(title: "Appearance", action: nil, keyEquivalent: "")
+        let appearanceMenuItem = NSMenuItem(title: L10n.ContextMenu.appearance, action: nil, keyEquivalent: "")
         appearanceMenuItem.submenu = appearanceMenu
 
         menu.addItem(appearanceMenuItem)
         menu.addItem(NSMenuItem.separator())
 
-        let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ",")
+        let settingsItem = NSMenuItem(title: L10n.ContextMenu.settings, action: #selector(openSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
 
         menu.addItem(NSMenuItem.separator())
 
-        let quitItem = NSMenuItem(title: "Quit Lucida", action: #selector(quitApp), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: L10n.ContextMenu.quit, action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
 

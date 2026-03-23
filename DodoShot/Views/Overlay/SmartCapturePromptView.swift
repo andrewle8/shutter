@@ -33,7 +33,7 @@ struct SmartCapturePromptView: View {
             // Text field (NSTextField wrapper for proper focus)
             SmartCaptureTextField(
                 text: $prompt,
-                placeholder: "Add context, or press Enter to paste OCR...",
+                placeholder: L10n.SmartCapture.placeholder,
                 onSubmit: { onSubmit(prompt) },
                 onCancel: onCancel
             )
@@ -41,7 +41,7 @@ struct SmartCapturePromptView: View {
 
             // Submit button
             Button(action: { onSubmit(prompt) }) {
-                Text("Paste")
+                Text(L10n.SmartCapture.paste)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)

@@ -537,7 +537,7 @@ struct ColorInfoView: View {
         VStack(spacing: 12) {
             // Header with close button
             HStack {
-                Text("Picked Color")
+                Text(L10n.ColorPicker.pickedColor)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.secondary)
                 Spacer()

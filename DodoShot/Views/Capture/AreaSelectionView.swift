@@ -140,10 +140,10 @@ struct AreaSelectionView: View {
                 if !isDragging {
                     VStack {
                         if onWindowClick != nil || onFullscreen != nil {
-                            InstructionBadge(text: "areaSelection.unifiedInstruction".localized)
+                            InstructionBadge(text: L10n.AreaSelection.unifiedInstruction)
                                 .padding(.top, 60)
                         } else {
-                            InstructionBadge(text: "areaSelection.instruction".localized)
+                            InstructionBadge(text: L10n.AreaSelection.instruction)
                                 .padding(.top, 60)
                         }
                         Spacer()

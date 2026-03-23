@@ -527,7 +527,7 @@ class ScreenCaptureService: ObservableObject {
 
     private func showOCRError(error: Error) {
         let alert = NSAlert()
-        alert.messageText = "OCR failed"
+        alert.messageText = L10n.OCR.failed
         alert.informativeText = error.localizedDescription
         alert.alertStyle = .warning
         alert.runModal()
@@ -833,7 +833,7 @@ class ScreenCaptureService: ObservableObject {
                 pointSize: rect.size,
                 accumulatedText: "",
                 frameCount: 0,
-                maxFrames: 15,
+                maxFrames: 20,
                 previousText: ""
             )
         }
@@ -874,7 +874,8 @@ class ScreenCaptureService: ObservableObject {
                 let newText = ocrResult.rawText
 
                 // Check if content stopped changing (scroll reached the end)
-                if newText == previousText {
+                // Use similarity check instead of exact match since OCR output varies slightly
+                if self.ocrTextIsSame(newText, previousText) {
                     self.finishScrollingOCR(text: accumulatedText)
                     return
                 }
@@ -886,7 +887,8 @@ class ScreenCaptureService: ObservableObject {
                 )
 
                 // Scroll down
-                self.sendScrollEvent(amount: -5)
+                let scrollPixels = Int32(rect.height * 0.8)
+                self.sendScrollEvent(amount: -scrollPixels, rect: rect)
 
                 // Wait for scroll to settle, then capture next frame
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
@@ -907,9 +909,37 @@ class ScreenCaptureService: ObservableObject {
         }
     }
 
-    private func sendScrollEvent(amount: Int32) {
-        let event = CGEvent(scrollWheelEvent2Source: nil, units: .line, wheelCount: 1, wheel1: amount, wheel2: 0, wheel3: 0)
+    private func sendScrollEvent(amount: Int32, rect: CGRect) {
+        let event = CGEvent(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: amount, wheel2: 0, wheel3: 0)
+        event?.location = CGPoint(x: rect.midX, y: rect.midY)
         event?.post(tap: .cgSessionEventTap)
+    }
+
+    /// Check if two OCR text outputs represent the same content.
+    /// Uses line-level similarity (>90% of lines match) to tolerate minor OCR variance.
+    private func ocrTextIsSame(_ a: String, _ b: String) -> Bool {
+        guard !a.isEmpty, !b.isEmpty else { return a.isEmpty && b.isEmpty }
+
+        let aLines = a.components(separatedBy: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
+        let bLines = b.components(separatedBy: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
+
+        // If line counts differ significantly, they're different
+        if abs(aLines.count - bLines.count) > max(1, aLines.count / 5) {
+            return false
+        }
+
+        // Compare overlapping lines
+        let count = min(aLines.count, bLines.count)
+        guard count > 0 else { return true }
+
+        var matchingLines = 0
+        for i in 0..<count {
+            if aLines[i] == bLines[i] {
+                matchingLines += 1
+            }
+        }
+
+        return Double(matchingLines) / Double(count) > 0.9
     }
 
     private func finishScrollingOCR(text: String) {
@@ -1202,7 +1232,7 @@ struct OCRResultView: View {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
                     .font(.system(size: 16))
-                Text("Text copied to clipboard")
+                Text(L10n.OCR.textCopied)
                     .font(.system(size: 13, weight: .medium))
 
                 Spacer()
@@ -1288,7 +1318,7 @@ struct OCRResultView: View {
 
                 Spacer()
 
-                Button("Close") {
+                Button(L10n.ScreenSelection.close) {
                     onDismiss()
                 }
                 .keyboardShortcut(.defaultAction)
@@ -1306,7 +1336,7 @@ struct TimedCaptureModalView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Select timer delay")
+            Text(L10n.Timer.selectDelay)
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(.secondary)
 
@@ -1316,7 +1346,7 @@ struct TimedCaptureModalView: View {
                 TimerOptionButton(seconds: 10, onSelect: onSelect)
             }
 
-            Button("Cancel") {
+            Button(L10n.Timer.cancel) {
                 onCancel()
             }
             .buttonStyle(.plain)
@@ -1341,7 +1371,7 @@ struct TimerOptionButton: View {
                     .font(.system(size: 28, weight: .bold, design: .rounded))
                     .foregroundColor(isHovered ? .white : .primary)
 
-                Text("sec")
+                Text(L10n.Timer.seconds)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(isHovered ? .white.opacity(0.8) : .secondary)
             }
@@ -1462,7 +1492,7 @@ struct ScreenPickerModalView: View {
                 }
             }
 
-            Button("Cancel") {
+            Button(L10n.Timer.cancel) {
                 onCancel()
             }
             .buttonStyle(.plain)

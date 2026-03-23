@@ -83,7 +83,7 @@ struct PermissionOnboardingView: View {
                 )
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("Lucida setup")
+                Text(L10n.Onboarding.setup)
                     .font(.system(size: 18, weight: .semibold))
 
                 Text("Step \(stepNumber) of 2")
@@ -135,10 +135,10 @@ struct PermissionOnboardingView: View {
 
             // Title and description
             VStack(spacing: 8) {
-                Text("Screen recording")
+                Text(L10n.Onboarding.screenRecording)
                     .font(.system(size: 20, weight: .semibold))
 
-                Text("Lucida needs screen recording permission to capture screenshots of your screen.")
+                Text(L10n.Onboarding.screenRecordingDescription)
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -155,7 +155,7 @@ struct PermissionOnboardingView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "gear")
                         .font(.system(size: 14, weight: .medium))
-                    Text("Open system settings")
+                    Text(L10n.Onboarding.openSystemSettings)
                         .font(.system(size: 14, weight: .medium))
                 }
                 .foregroundColor(.white)
@@ -170,10 +170,10 @@ struct PermissionOnboardingView: View {
 
             // Help text
             VStack(spacing: 4) {
-                Text("Enable Lucida in Privacy & Security → Screen Recording")
+                Text(L10n.Onboarding.screenRecordingHint)
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
-                Text("After enabling, restart Lucida for changes to take effect")
+                Text(L10n.Onboarding.screenRecordingRestart)
                     .font(.system(size: 10))
                     .foregroundColor(.secondary.opacity(0.7))
             }
@@ -201,10 +201,10 @@ struct PermissionOnboardingView: View {
 
             // Title and description
             VStack(spacing: 8) {
-                Text("Accessibility")
+                Text(L10n.Onboarding.accessibility)
                     .font(.system(size: 20, weight: .semibold))
 
-                Text("Lucida needs accessibility permission to enable global keyboard shortcuts.")
+                Text(L10n.Onboarding.accessibilityDescription)
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -221,7 +221,7 @@ struct PermissionOnboardingView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "hand.raised")
                         .font(.system(size: 14, weight: .medium))
-                    Text("Grant accessibility permission")
+                    Text(L10n.Onboarding.grantAccessibility)
                         .font(.system(size: 14, weight: .medium))
                 }
                 .foregroundColor(.white)
@@ -238,7 +238,7 @@ struct PermissionOnboardingView: View {
             Button(action: {
                 permissionManager.openAccessibilitySettings()
             }) {
-                Text("Open system settings manually")
+                Text(L10n.Onboarding.openSettingsManually)
                     .font(.system(size: 12))
                     .foregroundColor(.blue)
             }
@@ -251,7 +251,7 @@ struct PermissionOnboardingView: View {
                 permissionManager.bypassAccessibility()
                 onComplete()
             }) {
-                Text("I've enabled it, continue →")
+                Text(L10n.Onboarding.accessibilityEnabled)
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(.blue)
             }
@@ -279,10 +279,10 @@ struct PermissionOnboardingView: View {
 
             // Title and description
             VStack(spacing: 8) {
-                Text("You're all set!")
+                Text(L10n.Onboarding.allSet)
                     .font(.system(size: 20, weight: .semibold))
 
-                Text("Lucida is ready to use. Click the menu bar icon or use keyboard shortcuts to capture screenshots.")
+                Text(L10n.Onboarding.allSetDescription)
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -294,9 +294,9 @@ struct PermissionOnboardingView: View {
             // Keyboard shortcuts hint
             VStack(spacing: 6) {
                 HStack(spacing: 20) {
-                    shortcutHint(shortcut: "⌘⇧4", label: "Area")
-                    shortcutHint(shortcut: "⌘⇧5", label: "Window")
-                    shortcutHint(shortcut: "⌘⇧3", label: "Fullscreen")
+                    shortcutHint(shortcut: "⌘⇧4", label: L10n.Onboarding.area)
+                    shortcutHint(shortcut: "⌘⇧5", label: L10n.Onboarding.window)
+                    shortcutHint(shortcut: "⌘⇧3", label: L10n.Onboarding.fullscreen)
                 }
             }
             .padding(.vertical, 12)

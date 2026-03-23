@@ -3,6 +3,9 @@
   Lucida - German (Deutsch)
 */
 
+// MARK: - App
+"app.failedToOpenProject" = "Projekt konnte nicht geöffnet werden";
+
 // MARK: - Menu Bar
 "menu.capture" = "Aufnehmen";
 "menu.area" = "Bereich";
@@ -32,6 +35,9 @@
 "menu.ready" = "Bereit zum Aufnehmen";
 "menu.scrolling.description" = "Lange Seiten aufnehmen";
 "menu.clearHistory" = "Verlauf löschen";
+"menu.back" = "Zurück";
+"menu.autoCopy" = "Auto-Kopie";
+"menu.hideDesktop" = "Desktop ausblenden";
 
 // MARK: - Capture Types
 "capture.area" = "Bereich";
@@ -47,6 +53,7 @@
 "overlay.close" = "Schließen";
 "overlay.justNow" = "Gerade eben";
 "overlay.copied" = "Kopiert";
+"overlay.backdrop" = "Hintergrund";
 "overlay.backdrop.none" = "Kein";
 "overlay.backdrop.white" = "Weiß";
 "overlay.backdrop.dark" = "Dunkel";
@@ -63,6 +70,7 @@
 "annotation.highlight" = "Hervorheben";
 "annotation.freehand" = "Freihand";
 "annotation.undo" = "Rückgängig";
+"annotation.redo" = "Wiederholen";
 "annotation.clear" = "Löschen";
 "annotation.cancel" = "Abbrechen";
 "annotation.addText" = "Text hinzufügen";
@@ -70,6 +78,28 @@
 "annotation.textPlaceholder" = "Text eingeben...";
 "annotation.annotations" = "%d Anmerkung";
 "annotation.annotationsPlural" = "%d Anmerkungen";
+"annotation.copiedToClipboard" = "In die Zwischenablage kopiert";
+"annotation.back" = "Nach hinten";
+"annotation.front" = "Nach vorne";
+"annotation.ocr" = "OCR";
+"annotation.describe" = "Beschreiben";
+"annotation.saveProject" = "Projekt speichern";
+"annotation.delete" = "Löschen";
+"annotation.duplicate" = "Duplizieren";
+"annotation.bringToFront" = "In den Vordergrund";
+"annotation.sendToBack" = "In den Hintergrund";
+"annotation.backdrop" = "Hintergrund";
+"annotation.backdrop.type" = "Typ";
+"annotation.backdrop.shadow" = "Schatten";
+"annotation.backdrop.blur" = "Unschärfe";
+"annotation.backdrop.offset" = "Versatz";
+"annotation.backdrop.opacity" = "Deckkraft";
+"annotation.backdrop.borderRadius" = "Rahmenradius";
+"annotation.backdrop.inner" = "Innen";
+"annotation.backdrop.outer" = "Außen";
+"annotation.backdrop.solidColors" = "Einfarbig";
+"annotation.backdrop.direction" = "Richtung";
+"annotation.backdrop.gradients" = "Verläufe";
 
 // MARK: - Settings
 "settings.title" = "Einstellungen";
@@ -77,6 +107,18 @@
 "settings.hotkeys" = "Tastenkürzel";
 "settings.ai" = "KI";
 "settings.about" = "Über";
+
+// Settings - Startup
+"settings.startup" = "Autostart";
+"settings.launchAtLogin" = "Bei Anmeldung starten";
+"settings.launchAtLogin.description" = "Lucida automatisch beim Anmelden starten";
+"settings.showInDock" = "Im Dock anzeigen";
+"settings.showInDock.description" = "Lucida im Dock und Cmd-Tab-Umschalter anzeigen. Änderungen gelten beim nächsten Start.";
+
+// Settings - Privacy
+"settings.privacy" = "Datenschutz";
+"settings.saveHistory" = "Aufnahmeverlauf speichern";
+"settings.saveHistory.description" = "Letzte Aufnahmen für schnellen Zugriff im Speicher behalten";
 
 // Settings - General
 "settings.appearance" = "Erscheinungsbild";
@@ -98,6 +140,20 @@
 "settings.storage" = "Speicher";
 "settings.saveLocation" = "Speicherort";
 "settings.choose" = "Auswählen";
+
+// Settings - OCR
+"settings.ocrSection" = "OCR / Textextraktion";
+"settings.ocrOutputFormat" = "Ausgabeformat";
+"settings.ocrFormat.auto" = "Erkennt Code, Tabellen, Listen und Fehler automatisch. Umschließt Code mit Sprachmarkierungen.";
+"settings.ocrFormat.markdown" = "Formatiert immer als Markdown. Code wird zu Codeblöcken, ausgerichteter Text zu Tabellen.";
+"settings.ocrFormat.plain" = "Rohtext ohne Formatierung. Bewahrt die Einrückung aus der Layout-Analyse.";
+
+// Settings - Image Format
+"settings.imageFormat" = "Bildformat";
+"settings.imageFormat.auto" = "Wählt automatisch PNG für Text/UI-Screenshots, JPG für Fotos";
+"settings.jpgQuality" = "JPG-Qualität";
+"settings.jpgQuality.smaller" = "Kleinere Datei";
+"settings.jpgQuality.better" = "Bessere Qualität";
 
 // Settings - Hotkeys
 "settings.shortcuts" = "Tastenkürzel";
@@ -137,6 +193,16 @@
 "settings.ocrExtraction.description" = "Text aus Aufnahmen extrahieren und kopieren";
 "settings.contentSuggestions" = "Inhaltsvorschläge";
 "settings.contentSuggestions.description" = "Intelligente Vorschläge für Anmerkungen erhalten";
+"settings.ai.onDevice" = "Nutzt KI auf dem Gerät. Kein API-Schlüssel erforderlich.";
+"settings.ai.onDevice.description" = "Beschreibungen werden lokal mit Apple Intelligence erstellt. Verarbeitung ist privat und kostenlos.";
+
+// Settings - LLM Cleanup
+"settings.llmCleanup" = "LLM-Bereinigung";
+"settings.llmCleanup.description" = "Nutzt lokales Ollama-Modell zur Korrektur von OCR-Fehlern und Formatierung";
+"settings.llmCleanup.ollamaRunning" = "Ollama aktiv";
+"settings.llmCleanup.ollamaOffline" = "Ollama offline";
+"settings.llmCleanup.model" = "Modell";
+"settings.llmCleanup.modelName" = "Modellname";
 
 // Settings - About
 "settings.version" = "Version %@";
@@ -144,6 +210,7 @@
 "settings.openSource" = "Open Source • MIT-Lizenz";
 "settings.viewOnGitHub" = "Auf GitHub ansehen";
 "settings.madeWith" = "Mit ♥ für die macOS-Community gemacht";
+"settings.madeBy" = "Erstellt von Andrew Le";
 
 // MARK: - Capture History
 "history.title" = "Aufnahmeverlauf";
@@ -194,3 +261,58 @@
 "contextMenu.annotate" = "Bearbeiten";
 "contextMenu.pin" = "An Bildschirm anheften";
 "contextMenu.delete" = "Löschen";
+"contextMenu.dark" = "Dunkel";
+"contextMenu.light" = "Hell";
+"contextMenu.system" = "System";
+"contextMenu.settings" = "Einstellungen...";
+"contextMenu.quit" = "Lucida beenden";
+
+// MARK: - Floating Window
+"floating.clickThrough" = "Durchklick";
+"floating.copied" = "Kopiert";
+
+// MARK: - Color Picker
+"colorPicker.pickedColor" = "Ausgewählte Farbe";
+
+// MARK: - OCR
+"ocr.failed" = "OCR fehlgeschlagen";
+"ocr.textCopied" = "Text in die Zwischenablage kopiert";
+
+// MARK: - Timer
+"timer.selectDelay" = "Timer-Verzögerung wählen";
+"timer.seconds" = "Sek.";
+"timer.cancel" = "Abbrechen";
+
+// MARK: - Screen Selection
+"screenSelection.cancel" = "Abbrechen";
+"screenSelection.close" = "Schließen";
+
+// MARK: - Welcome HUD
+"welcome.ready" = "Lucida ist bereit";
+"welcome.description" = "Alles auf Ihrem Bildschirm aufnehmen";
+"welcome.area" = "Bereich";
+"welcome.autoPaste" = "Auto-Einfügen";
+"welcome.ocrPaste" = "OCR Paste";
+"welcome.forClaude" = "Für Claude";
+
+// MARK: - Smart Capture
+"smartCapture.paste" = "Einfügen";
+"smartCapture.placeholder" = "Kontext hinzufügen oder Enter für OCR-Einfügen...";
+
+// MARK: - Onboarding
+"onboarding.setup" = "Lucida-Einrichtung";
+"onboarding.screenRecording" = "Bildschirmaufnahme";
+"onboarding.screenRecording.description" = "Lucida benötigt die Bildschirmaufnahme-Berechtigung für Screenshots.";
+"onboarding.openSystemSettings" = "Systemeinstellungen öffnen";
+"onboarding.screenRecording.hint" = "Lucida unter Datenschutz & Sicherheit → Bildschirmaufnahme aktivieren";
+"onboarding.screenRecording.restart" = "Nach dem Aktivieren Lucida neu starten";
+"onboarding.accessibility" = "Bedienungshilfen";
+"onboarding.accessibility.description" = "Lucida benötigt die Bedienungshilfen-Berechtigung für globale Tastenkürzel.";
+"onboarding.grantAccessibility" = "Bedienungshilfen-Berechtigung erteilen";
+"onboarding.openSettingsManually" = "Systemeinstellungen manuell öffnen";
+"onboarding.accessibilityEnabled" = "Ich habe es aktiviert, weiter →";
+"onboarding.allSet" = "Alles bereit!";
+"onboarding.allSet.description" = "Lucida ist einsatzbereit. Klicken Sie auf das Menüleistensymbol oder verwenden Sie Tastenkürzel für Screenshots.";
+"onboarding.area" = "Bereich";
+"onboarding.window" = "Fenster";
+"onboarding.fullscreen" = "Vollbild";

@@ -780,7 +780,7 @@ class OCRService {
 
     /// Simple character-level similarity ratio
     private static func stringSimilarity(_ a: String, _ b: String) -> Double {
-        guard !a.isEmpty || !b.isEmpty else { return 1.0 }
+        guard !a.isEmpty, !b.isEmpty else { return 0.0 }
         let maxLen = max(a.count, b.count)
         guard maxLen > 0 else { return 1.0 }
 

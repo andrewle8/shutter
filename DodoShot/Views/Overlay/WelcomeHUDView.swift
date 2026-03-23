@@ -112,11 +112,11 @@ struct WelcomeHUDView: View {
                     )
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Lucida is ready")
+                    Text(L10n.Welcome.ready)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(.primary)
 
-                    Text("Capture anything on your screen")
+                    Text(L10n.Welcome.description)
                         .font(.system(size: 12))
                         .foregroundColor(.secondary)
                 }
@@ -140,7 +140,7 @@ struct WelcomeHUDView: View {
             HStack(spacing: 8) {
                 ShortcutCard(
                     shortcut: "\u{2318}\u{21E7}4",
-                    label: "Area",
+                    label: L10n.Welcome.area,
                     icon: "rectangle.dashed",
                     color: .green,
                     isPrimary: true
@@ -148,7 +148,7 @@ struct WelcomeHUDView: View {
 
                 ShortcutCard(
                     shortcut: "\u{2318}\u{21E7}6",
-                    label: "Auto-paste",
+                    label: L10n.Welcome.autoPaste,
                     icon: "doc.on.clipboard",
                     color: .green,
                     isPrimary: false
@@ -156,7 +156,7 @@ struct WelcomeHUDView: View {
 
                 ShortcutCard(
                     shortcut: "\u{2318}\u{21E7}7",
-                    label: "OCR Paste",
+                    label: L10n.Welcome.ocrPaste,
                     icon: "text.viewfinder",
                     color: .green,
                     isPrimary: false
@@ -164,7 +164,7 @@ struct WelcomeHUDView: View {
 
                 ShortcutCard(
                     shortcut: "\u{2318}\u{21E7}F",
-                    label: "For Claude",
+                    label: L10n.Welcome.forClaude,
                     icon: "sparkles",
                     color: .green,
                     isPrimary: false

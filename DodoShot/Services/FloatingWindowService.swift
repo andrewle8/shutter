@@ -193,7 +193,7 @@ struct FloatingScreenshotView: View {
                     HStack {
                         Image(systemName: "cursorarrow.click.badge.clock")
                             .font(.system(size: 10))
-                        Text("Click-through")
+                        Text(L10n.Floating.clickThrough)
                             .font(.system(size: 9, weight: .medium))
                     }
                     .foregroundColor(.orange)
@@ -214,7 +214,7 @@ struct FloatingScreenshotView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "checkmark")
                             .font(.system(size: 10, weight: .bold))
-                        Text("Copied")
+                        Text(L10n.Floating.copied)
                             .font(.system(size: 10, weight: .semibold))
                     }
                     .foregroundColor(.white)

@@ -15,6 +15,11 @@ extension String {
 
 // MARK: - Localization Keys
 enum L10n {
+    // MARK: - App
+    enum App {
+        static let failedToOpenProject = "app.failedToOpenProject".localized
+    }
+
     // MARK: - Menu Bar
     enum Menu {
         static let capture = "menu.capture".localized
@@ -42,6 +47,9 @@ enum L10n {
         static let selectScreen = "menu.selectScreen".localized
         static let allScreens = "menu.allScreens".localized
         static let mainScreen = "menu.mainScreen".localized
+        static let back = "menu.back".localized
+        static let autoCopyToggle = "menu.autoCopy".localized
+        static let hideDesktop = "menu.hideDesktop".localized
     }
 
     // MARK: - Capture Types
@@ -60,6 +68,8 @@ enum L10n {
         static let pin = "overlay.pin".localized
         static let close = "overlay.close".localized
         static let justNow = "overlay.justNow".localized
+        static let copied = "overlay.copied".localized
+        static let backdrop = "overlay.backdrop".localized
         enum Backdrop {
             static let none = "overlay.backdrop.none".localized
             static let white = "overlay.backdrop.white".localized
@@ -80,11 +90,36 @@ enum L10n {
         static let highlight = "annotation.highlight".localized
         static let freehand = "annotation.freehand".localized
         static let undo = "annotation.undo".localized
+        static let redo = "annotation.redo".localized
         static let clear = "annotation.clear".localized
         static let cancel = "annotation.cancel".localized
         static let addText = "annotation.addText".localized
         static let addTextTitle = "annotation.addTextTitle".localized
         static let textPlaceholder = "annotation.textPlaceholder".localized
+        static let copiedToClipboard = "annotation.copiedToClipboard".localized
+        static let back = "annotation.back".localized
+        static let front = "annotation.front".localized
+        static let ocr = "annotation.ocr".localized
+        static let describe = "annotation.describe".localized
+        static let saveProject = "annotation.saveProject".localized
+        static let delete = "annotation.delete".localized
+        static let duplicate = "annotation.duplicate".localized
+        static let bringToFront = "annotation.bringToFront".localized
+        static let sendToBack = "annotation.sendToBack".localized
+        static let backdrop = "annotation.backdrop".localized
+        enum BackdropLabels {
+            static let type = "annotation.backdrop.type".localized
+            static let shadow = "annotation.backdrop.shadow".localized
+            static let blurAmount = "annotation.backdrop.blur".localized
+            static let offset = "annotation.backdrop.offset".localized
+            static let opacity = "annotation.backdrop.opacity".localized
+            static let borderRadius = "annotation.backdrop.borderRadius".localized
+            static let inner = "annotation.backdrop.inner".localized
+            static let outer = "annotation.backdrop.outer".localized
+            static let solidColors = "annotation.backdrop.solidColors".localized
+            static let direction = "annotation.backdrop.direction".localized
+            static let gradients = "annotation.backdrop.gradients".localized
+        }
         static func annotations(_ count: Int) -> String {
             count == 1 ? "annotation.annotations".localized(count) : "annotation.annotationsPlural".localized(count)
         }
@@ -141,6 +176,32 @@ enum L10n {
         static let permissionsDescription = "settings.permissions.description".localized
         static let openSettings = "settings.openSettings".localized
 
+        // Startup
+        static let startup = "settings.startup".localized
+        static let launchAtLogin = "settings.launchAtLogin".localized
+        static let launchAtLoginDescription = "settings.launchAtLogin.description".localized
+        static let showInDock = "settings.showInDock".localized
+        static let showInDockDescription = "settings.showInDock.description".localized
+
+        // Privacy
+        static let privacy = "settings.privacy".localized
+        static let saveHistory = "settings.saveHistory".localized
+        static let saveHistoryDescription = "settings.saveHistory.description".localized
+
+        // OCR
+        static let ocrSection = "settings.ocrSection".localized
+        static let ocrOutputFormat = "settings.ocrOutputFormat".localized
+        static let ocrFormatAuto = "settings.ocrFormat.auto".localized
+        static let ocrFormatMarkdown = "settings.ocrFormat.markdown".localized
+        static let ocrFormatPlain = "settings.ocrFormat.plain".localized
+
+        // Image format
+        static let imageFormat = "settings.imageFormat".localized
+        static let imageFormatAuto = "settings.imageFormat.auto".localized
+        static let jpgQuality = "settings.jpgQuality".localized
+        static let jpgQualitySmaller = "settings.jpgQuality.smaller".localized
+        static let jpgQualityBetter = "settings.jpgQuality.better".localized
+
         // AI
         static let llmConfig = "settings.llmConfig".localized
         static let provider = "settings.provider".localized
@@ -154,6 +215,16 @@ enum L10n {
         static let ocrExtractionDescription = "settings.ocrExtraction.description".localized
         static let contentSuggestions = "settings.contentSuggestions".localized
         static let contentSuggestionsDescription = "settings.contentSuggestions.description".localized
+        static let aiOnDevice = "settings.ai.onDevice".localized
+        static let aiOnDeviceDescription = "settings.ai.onDevice.description".localized
+
+        // LLM Cleanup
+        static let llmCleanup = "settings.llmCleanup".localized
+        static let llmCleanupDescription = "settings.llmCleanup.description".localized
+        static let llmCleanupOllamaRunning = "settings.llmCleanup.ollamaRunning".localized
+        static let llmCleanupOllamaOffline = "settings.llmCleanup.ollamaOffline".localized
+        static let llmCleanupModel = "settings.llmCleanup.model".localized
+        static let llmCleanupModelName = "settings.llmCleanup.modelName".localized
 
         // About
         static func version(_ v: String) -> String { "settings.version".localized(v) }
@@ -161,6 +232,7 @@ enum L10n {
         static let openSource = "settings.openSource".localized
         static let viewOnGitHub = "settings.viewOnGitHub".localized
         static let madeWith = "settings.madeWith".localized
+        static let madeBy = "settings.madeBy".localized
     }
 
     // MARK: - Capture History
@@ -214,5 +286,82 @@ enum L10n {
         static let annotate = "contextMenu.annotate".localized
         static let pin = "contextMenu.pin".localized
         static let delete = "contextMenu.delete".localized
+        static let dark = "contextMenu.dark".localized
+        static let light = "contextMenu.light".localized
+        static let system = "contextMenu.system".localized
+        static let settings = "contextMenu.settings".localized
+        static let quit = "contextMenu.quit".localized
+    }
+
+    // MARK: - Area Selection
+    enum AreaSelection {
+        static let instruction = "areaSelection.instruction".localized
+        static let unifiedInstruction = "areaSelection.unifiedInstruction".localized
+    }
+
+    // MARK: - Floating Window
+    enum Floating {
+        static let clickThrough = "floating.clickThrough".localized
+        static let copied = "floating.copied".localized
+    }
+
+    // MARK: - Color Picker
+    enum ColorPicker {
+        static let pickedColor = "colorPicker.pickedColor".localized
+    }
+
+    // MARK: - OCR
+    enum OCR {
+        static let failed = "ocr.failed".localized
+        static let textCopied = "ocr.textCopied".localized
+    }
+
+    // MARK: - Timer
+    enum Timer {
+        static let selectDelay = "timer.selectDelay".localized
+        static let seconds = "timer.seconds".localized
+        static let cancel = "timer.cancel".localized
+    }
+
+    // MARK: - Screen Selection
+    enum ScreenSelection {
+        static let cancel = "screenSelection.cancel".localized
+        static let close = "screenSelection.close".localized
+    }
+
+    // MARK: - Welcome HUD
+    enum Welcome {
+        static let ready = "welcome.ready".localized
+        static let description = "welcome.description".localized
+        static let area = "welcome.area".localized
+        static let autoPaste = "welcome.autoPaste".localized
+        static let ocrPaste = "welcome.ocrPaste".localized
+        static let forClaude = "welcome.forClaude".localized
+    }
+
+    // MARK: - Smart Capture
+    enum SmartCapture {
+        static let paste = "smartCapture.paste".localized
+        static let placeholder = "smartCapture.placeholder".localized
+    }
+
+    // MARK: - Onboarding
+    enum Onboarding {
+        static let setup = "onboarding.setup".localized
+        static let screenRecording = "onboarding.screenRecording".localized
+        static let screenRecordingDescription = "onboarding.screenRecording.description".localized
+        static let openSystemSettings = "onboarding.openSystemSettings".localized
+        static let screenRecordingHint = "onboarding.screenRecording.hint".localized
+        static let screenRecordingRestart = "onboarding.screenRecording.restart".localized
+        static let accessibility = "onboarding.accessibility".localized
+        static let accessibilityDescription = "onboarding.accessibility.description".localized
+        static let grantAccessibility = "onboarding.grantAccessibility".localized
+        static let openSettingsManually = "onboarding.openSettingsManually".localized
+        static let accessibilityEnabled = "onboarding.accessibilityEnabled".localized
+        static let allSet = "onboarding.allSet".localized
+        static let allSetDescription = "onboarding.allSet.description".localized
+        static let area = "onboarding.area".localized
+        static let window = "onboarding.window".localized
+        static let fullscreen = "onboarding.fullscreen".localized
     }
 }

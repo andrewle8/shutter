@@ -3,6 +3,9 @@
   Lucida - Spanish (Español)
 */
 
+// MARK: - App
+"app.failedToOpenProject" = "No se pudo abrir el proyecto";
+
 // MARK: - Menu Bar
 "menu.capture" = "Capturar";
 "menu.area" = "Área";
@@ -32,6 +35,9 @@
 "menu.ready" = "Listo para capturar";
 "menu.scrolling.description" = "Capturar páginas largas";
 "menu.clearHistory" = "Borrar historial";
+"menu.back" = "Atrás";
+"menu.autoCopy" = "Auto-copiar";
+"menu.hideDesktop" = "Ocultar escritorio";
 
 // MARK: - Capture Types
 "capture.area" = "Área";
@@ -47,6 +53,7 @@
 "overlay.close" = "Cerrar";
 "overlay.justNow" = "Ahora mismo";
 "overlay.copied" = "Copiado";
+"overlay.backdrop" = "Fondo";
 "overlay.backdrop.none" = "Ninguno";
 "overlay.backdrop.white" = "Blanco";
 "overlay.backdrop.dark" = "Oscuro";
@@ -63,6 +70,7 @@
 "annotation.highlight" = "Resaltar";
 "annotation.freehand" = "Mano alzada";
 "annotation.undo" = "Deshacer";
+"annotation.redo" = "Rehacer";
 "annotation.clear" = "Borrar";
 "annotation.cancel" = "Cancelar";
 "annotation.addText" = "Añadir texto";
@@ -70,6 +78,28 @@
 "annotation.textPlaceholder" = "Escribe tu texto...";
 "annotation.annotations" = "%d anotación";
 "annotation.annotationsPlural" = "%d anotaciones";
+"annotation.copiedToClipboard" = "Copiado al portapapeles";
+"annotation.back" = "Atrás";
+"annotation.front" = "Adelante";
+"annotation.ocr" = "OCR";
+"annotation.describe" = "Describir";
+"annotation.saveProject" = "Guardar proyecto";
+"annotation.delete" = "Eliminar";
+"annotation.duplicate" = "Duplicar";
+"annotation.bringToFront" = "Traer al frente";
+"annotation.sendToBack" = "Enviar al fondo";
+"annotation.backdrop" = "Fondo";
+"annotation.backdrop.type" = "Tipo";
+"annotation.backdrop.shadow" = "Sombra";
+"annotation.backdrop.blur" = "Desenfoque";
+"annotation.backdrop.offset" = "Desplazamiento";
+"annotation.backdrop.opacity" = "Opacidad";
+"annotation.backdrop.borderRadius" = "Radio del borde";
+"annotation.backdrop.inner" = "Interior";
+"annotation.backdrop.outer" = "Exterior";
+"annotation.backdrop.solidColors" = "Colores sólidos";
+"annotation.backdrop.direction" = "Dirección";
+"annotation.backdrop.gradients" = "Degradados";
 
 // MARK: - Settings
 "settings.title" = "Ajustes";
@@ -77,6 +107,18 @@
 "settings.hotkeys" = "Atajos";
 "settings.ai" = "IA";
 "settings.about" = "Acerca de";
+
+// Settings - Startup
+"settings.startup" = "Inicio";
+"settings.launchAtLogin" = "Iniciar sesión automáticamente";
+"settings.launchAtLogin.description" = "Iniciar Lucida automáticamente al iniciar sesión";
+"settings.showInDock" = "Mostrar en el Dock";
+"settings.showInDock.description" = "Mostrar Lucida en el Dock y el selector Cmd-Tab. Los cambios se aplican en el próximo inicio.";
+
+// Settings - Privacy
+"settings.privacy" = "Privacidad";
+"settings.saveHistory" = "Guardar historial de capturas";
+"settings.saveHistory.description" = "Mantener capturas recientes en memoria para acceso rápido";
 
 // Settings - General
 "settings.appearance" = "Apariencia";
@@ -99,6 +141,20 @@
 "settings.saveLocation" = "Ubicación de guardado";
 "settings.choose" = "Elegir";
 
+// Settings - OCR
+"settings.ocrSection" = "OCR / Extracción de texto";
+"settings.ocrOutputFormat" = "Formato de salida";
+"settings.ocrFormat.auto" = "Detecta código, tablas, listas y errores automáticamente. Envuelve código en bloques con etiquetas de lenguaje.";
+"settings.ocrFormat.markdown" = "Siempre formatea como Markdown. El código se convierte en bloques, el texto alineado en tablas.";
+"settings.ocrFormat.plain" = "Texto sin formato. Preserva la indentación del análisis de diseño.";
+
+// Settings - Image Format
+"settings.imageFormat" = "Formato de imagen";
+"settings.imageFormat.auto" = "Selecciona automáticamente PNG para texto/UI, JPG para fotos";
+"settings.jpgQuality" = "Calidad JPG";
+"settings.jpgQuality.smaller" = "Archivo más pequeño";
+"settings.jpgQuality.better" = "Mejor calidad";
+
 // Settings - Hotkeys
 "settings.shortcuts" = "Atajos de teclado";
 "settings.areaCapture" = "Captura de área";
@@ -117,7 +173,7 @@
 "settings.captureError" = "Capturar texto de error";
 "settings.captureForClaude" = "Captura para Claude";
 "settings.captureCode" = "Capturar bloque de código";
-"settings.recaptureLastArea" = "Recapturar ultima area";
+"settings.recaptureLastArea" = "Recapturar última área";
 "settings.smartCapture" = "Captura inteligente";
 "settings.recording" = "Grabando...";
 "settings.permissions" = "Permiso de accesibilidad requerido";
@@ -137,6 +193,16 @@
 "settings.ocrExtraction.description" = "Extraer y copiar texto de cualquier captura";
 "settings.contentSuggestions" = "Sugerencias de contenido";
 "settings.contentSuggestions.description" = "Obtener sugerencias inteligentes para anotaciones";
+"settings.ai.onDevice" = "Usa IA en el dispositivo. No requiere clave API.";
+"settings.ai.onDevice.description" = "Las descripciones se generan localmente con Apple Intelligence. El procesamiento es privado y gratuito.";
+
+// Settings - LLM Cleanup
+"settings.llmCleanup" = "Limpieza LLM";
+"settings.llmCleanup.description" = "Usa modelo local de Ollama para corregir errores OCR y mejorar formato";
+"settings.llmCleanup.ollamaRunning" = "Ollama activo";
+"settings.llmCleanup.ollamaOffline" = "Ollama sin conexión";
+"settings.llmCleanup.model" = "Modelo";
+"settings.llmCleanup.modelName" = "Nombre del modelo";
 
 // Settings - About
 "settings.version" = "Versión %@";
@@ -144,6 +210,7 @@
 "settings.openSource" = "Código abierto • Licencia MIT";
 "settings.viewOnGitHub" = "Ver en GitHub";
 "settings.madeWith" = "Hecho con ♥ para la comunidad macOS";
+"settings.madeBy" = "Creado por Andrew Le";
 
 // MARK: - Capture History
 "history.title" = "Historial de capturas";
@@ -194,3 +261,58 @@
 "contextMenu.annotate" = "Anotar";
 "contextMenu.pin" = "Fijar en pantalla";
 "contextMenu.delete" = "Eliminar";
+"contextMenu.dark" = "Oscuro";
+"contextMenu.light" = "Claro";
+"contextMenu.system" = "Sistema";
+"contextMenu.settings" = "Ajustes...";
+"contextMenu.quit" = "Salir de Lucida";
+
+// MARK: - Floating Window
+"floating.clickThrough" = "Transparente al clic";
+"floating.copied" = "Copiado";
+
+// MARK: - Color Picker
+"colorPicker.pickedColor" = "Color seleccionado";
+
+// MARK: - OCR
+"ocr.failed" = "OCR fallido";
+"ocr.textCopied" = "Texto copiado al portapapeles";
+
+// MARK: - Timer
+"timer.selectDelay" = "Seleccionar retardo del temporizador";
+"timer.seconds" = "seg";
+"timer.cancel" = "Cancelar";
+
+// MARK: - Screen Selection
+"screenSelection.cancel" = "Cancelar";
+"screenSelection.close" = "Cerrar";
+
+// MARK: - Welcome HUD
+"welcome.ready" = "Lucida está lista";
+"welcome.description" = "Captura cualquier cosa en tu pantalla";
+"welcome.area" = "Área";
+"welcome.autoPaste" = "Auto-pegar";
+"welcome.ocrPaste" = "OCR Paste";
+"welcome.forClaude" = "Para Claude";
+
+// MARK: - Smart Capture
+"smartCapture.paste" = "Pegar";
+"smartCapture.placeholder" = "Añadir contexto o pulsa Enter para pegar OCR...";
+
+// MARK: - Onboarding
+"onboarding.setup" = "Configuración de Lucida";
+"onboarding.screenRecording" = "Grabación de pantalla";
+"onboarding.screenRecording.description" = "Lucida necesita permiso de grabación de pantalla para capturar tu pantalla.";
+"onboarding.openSystemSettings" = "Abrir ajustes del sistema";
+"onboarding.screenRecording.hint" = "Habilitar Lucida en Privacidad y seguridad → Grabación de pantalla";
+"onboarding.screenRecording.restart" = "Después de habilitar, reinicia Lucida para que los cambios surtan efecto";
+"onboarding.accessibility" = "Accesibilidad";
+"onboarding.accessibility.description" = "Lucida necesita permiso de accesibilidad para los atajos de teclado globales.";
+"onboarding.grantAccessibility" = "Conceder permiso de accesibilidad";
+"onboarding.openSettingsManually" = "Abrir ajustes del sistema manualmente";
+"onboarding.accessibilityEnabled" = "Ya lo habilité, continuar →";
+"onboarding.allSet" = "¡Todo listo!";
+"onboarding.allSet.description" = "Lucida está lista. Haz clic en el icono de la barra de menú o usa atajos de teclado para capturar.";
+"onboarding.area" = "Área";
+"onboarding.window" = "Ventana";
+"onboarding.fullscreen" = "Pantalla completa";
