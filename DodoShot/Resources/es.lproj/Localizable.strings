@@ -20,6 +20,11 @@
 "menu.settings" = "Ajustes";
 "menu.quit" = "Salir de Shutter";
 "menu.history" = "Historial";
+"menu.paste" = "Pegar";
+"menu.ocrPaste" = "OCR Paste";
+"menu.selectScreen" = "Seleccionar pantalla";
+"menu.allScreens" = "Todas las pantallas";
+"menu.mainScreen" = "Principal";
 "menu.ready" = "Listo para capturar";
 "menu.scrolling.description" = "Capturar páginas largas";
 "menu.clearHistory" = "Borrar historial";
@@ -87,6 +92,9 @@
 "settings.areaCapture" = "Captura de área";
 "settings.windowCapture" = "Captura de ventana";
 "settings.fullscreenCapture" = "Captura de pantalla completa";
+"settings.autoPasteCapture" = "Captura y pegado automático";
+"settings.ocrPasteCapture" = "Captura OCR y pegado";
+"settings.allScreensCapture" = "Captura de todas las pantallas";
 "settings.recording" = "Grabando...";
 "settings.permissions" = "Permiso de accesibilidad requerido";
 "settings.permissions.description" = "Shutter necesita acceso de accesibilidad para los atajos globales.";

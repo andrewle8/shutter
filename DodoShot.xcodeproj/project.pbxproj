@@ -38,6 +38,7 @@
 		ES2A3B4C5D6E7F8A9B0C1D2E /* es.lproj in Resources */ = {isa = PBXBuildFile; fileRef = ES1A2B3C4D5E6F7A8B9C0D1E /* es.lproj */; };
 		DE2A3B4C5D6E7F8A9B0C1D2E /* de.lproj in Resources */ = {isa = PBXBuildFile; fileRef = DE1A2B3C4D5E6F7A8B9C0D1E /* de.lproj */; };
 		WH2A3B4C5D6E7F8A9B0C1D2E /* WelcomeHUDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WH1A2B3C4D5E6F7A8B9C0D1E /* WelcomeHUDView.swift */; };
+		HS2A3B4C5D6E7F8A9B0C1D2E /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = HS1A2B3C4D5E6F7A8B9C0D1E /* HistoryStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,6 +76,7 @@
 		DE1A2B3C4D5E6F7A8B9C0D1E /* de.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = de.lproj; sourceTree = "<group>"; };
 		W0A1B2C3D4E5F6A7B8C9D0E1 /* WindowInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowInfo.swift; sourceTree = "<group>"; };
 		WH1A2B3C4D5E6F7A8B9C0D1E /* WelcomeHUDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeHUDView.swift; sourceTree = "<group>"; };
+		HS1A2B3C4D5E6F7A8B9C0D1E /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,6 +159,7 @@
 				D1A2B3C4D5E6F7A8B9C0D1E2 /* DesktopIconsService.swift */,
 				IFB000001 /* ImageFormatAnalyzer.swift */,
 				LAB000001 /* LaunchAtLoginManager.swift */,
+				HS1A2B3C4D5E6F7A8B9C0D1E /* HistoryStore.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -335,6 +338,7 @@
 				IFA000001 /* ImageFormatAnalyzer.swift in Sources */,
 				LAA000001 /* LaunchAtLoginManager.swift in Sources */,
 				WH2A3B4C5D6E7F8A9B0C1D2E /* WelcomeHUDView.swift in Sources */,
+				HS2A3B4C5D6E7F8A9B0C1D2E /* HistoryStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

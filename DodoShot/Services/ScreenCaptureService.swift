@@ -11,12 +11,17 @@ class ScreenCaptureService: ObservableObject {
     @Published var isCapturing = false
 
     private var captureWindows: [NSWindow] = []
+    private var previousApp: NSRunningApplication?
+    private var autoPasteAfterCapture = false
+    private var ocrPasteAfterCapture = false
 
     private init() {}
 
     // MARK: - Public Methods
 
     func startCapture(type: CaptureType) {
+        // Save the frontmost app BEFORE any overlay windows appear
+        previousApp = NSWorkspace.shared.frontmostApplication
         isCapturing = true
 
         switch type {
@@ -25,12 +30,64 @@ class ScreenCaptureService: ObservableObject {
         case .window:
             startWindowCapture()
         case .fullscreen:
-            captureFullscreen()
+            showScreenPickerOrCapture()
         }
     }
 
     func clearRecents() {
         recentCaptures.removeAll()
+    }
+
+    /// Capture an area and auto-paste into the previously-active app
+    func startCaptureAndPaste(type: CaptureType) {
+        autoPasteAfterCapture = true
+        startCapture(type: type)
+    }
+
+    /// Start OCR capture, extract text, and paste into the previously-active app
+    func startOCRCaptureAndPaste() {
+        ocrPasteAfterCapture = true
+        startOCRCapture()
+    }
+
+    /// Capture all screens into a single image
+    func captureAllScreens() {
+        isCapturing = true
+
+        // Small delay to ensure menu bar closes
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            guard let self = self else { return }
+
+            // CGRect.infinite captures the entire virtual display space (all monitors)
+            guard let cgImage = CGWindowListCreateImage(
+                CGRect.infinite,
+                .optionOnScreenOnly,
+                kCGNullWindowID,
+                [.bestResolution]
+            ) else {
+                self.isCapturing = false
+                return
+            }
+
+            // Compute the bounding rect of all screens in point space
+            let screens = NSScreen.screens
+            let union = screens.reduce(CGRect.null) { $0.union($1.frame) }
+            let nsImage = NSImage(cgImage: cgImage, size: union.size)
+            self.completeCapture(image: nsImage, type: .fullscreen)
+        }
+    }
+
+    /// Show a screen picker when multiple monitors are connected, or capture directly on single-monitor setups.
+    func showScreenPickerOrCapture() {
+        let screens = NSScreen.screens
+        if screens.count <= 1 {
+            // Single monitor -- capture immediately
+            captureFullscreen()
+            return
+        }
+
+        // Multiple monitors -- show picker
+        showScreenPickerModal()
     }
 
     func startScrollingCapture() {
@@ -139,6 +196,7 @@ class ScreenCaptureService: ObservableObject {
     /// Start OCR capture - select an area and extract text
     func startOCRCapture() {
         isCapturing = true
+        previousApp = NSWorkspace.shared.frontmostApplication
 
         guard let screen = NSScreen.main else {
             isCapturing = false
@@ -195,12 +253,19 @@ class ScreenCaptureService: ObservableObject {
             self.isCapturing = false
 
             // Perform OCR
+            let shouldPaste = self.ocrPasteAfterCapture
+            self.ocrPasteAfterCapture = false
+
             OCRService.shared.extractText(from: nsImage) { result in
                 switch result {
                 case .success(let text):
-                    // Copy to clipboard and show notification
+                    // Copy to clipboard
                     OCRService.shared.copyToClipboard(text)
-                    self.showOCRResult(text: text)
+                    if shouldPaste {
+                        self.pasteToFrontApp()
+                    } else {
+                        self.showOCRResult(text: text)
+                    }
                 case .failure(let error):
                     self.showOCRError(error: error)
                 }
@@ -484,16 +549,20 @@ class ScreenCaptureService: ObservableObject {
 
     // MARK: - Fullscreen Capture
 
-    private func captureFullscreen() {
-        guard let screen = NSScreen.main else {
+    /// Capture a single screen. Pass nil to capture the main screen.
+    func captureFullscreen(screen: NSScreen? = nil) {
+        let targetScreen = screen ?? NSScreen.main
+        guard let targetScreen = targetScreen else {
             isCapturing = false
             return
         }
 
+        isCapturing = true
+
         // Small delay to ensure menu bar closes
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             guard let cgImage = CGWindowListCreateImage(
-                screen.frame,
+                targetScreen.frame,
                 .optionOnScreenOnly,
                 kCGNullWindowID,
                 [.bestResolution]
@@ -503,9 +572,50 @@ class ScreenCaptureService: ObservableObject {
             }
 
             // Use screen.frame.size (points) not cgImage size (pixels) for correct Retina display
-            let nsImage = NSImage(cgImage: cgImage, size: screen.frame.size)
+            let nsImage = NSImage(cgImage: cgImage, size: targetScreen.frame.size)
             self?.completeCapture(image: nsImage, type: .fullscreen)
         }
+    }
+
+    /// Show a modal picker listing each connected screen plus an "All Screens" option.
+    private func showScreenPickerModal() {
+        guard let mainScreen = NSScreen.main else { return }
+
+        let windowSize = NSSize(width: 320, height: CGFloat(60 + NSScreen.screens.count * 48 + 48 + 24))
+        let windowOrigin = NSPoint(
+            x: (mainScreen.visibleFrame.width - windowSize.width) / 2 + mainScreen.visibleFrame.origin.x,
+            y: (mainScreen.visibleFrame.height - windowSize.height) / 2 + mainScreen.visibleFrame.origin.y
+        )
+
+        let window = NSWindow(
+            contentRect: NSRect(origin: windowOrigin, size: windowSize),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+
+        window.title = "menu.selectScreen".localized
+        window.level = .floating
+        window.isReleasedWhenClosed = false
+
+        let pickerView = ScreenPickerModalView(
+            onSelectScreen: { [weak self] screen in
+                window.close()
+                self?.captureFullscreen(screen: screen)
+            },
+            onSelectAll: { [weak self] in
+                window.close()
+                self?.captureAllScreens()
+            },
+            onCancel: {
+                window.close()
+            }
+        )
+
+        window.contentView = NSHostingView(rootView: pickerView)
+        window.center()
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     // MARK: - Capture Completion
@@ -547,10 +657,23 @@ class ScreenCaptureService: ObservableObject {
         if SettingsManager.shared.settings.saveHistory {
             recentCaptures.insert(screenshot, at: 0)
 
-            // Keep only last 10 captures
+            // Keep only last 10 captures in memory for menu bar popover
             if recentCaptures.count > 10 {
                 recentCaptures = Array(recentCaptures.prefix(10))
             }
+
+            // Persist to disk
+            HistoryStore.shared.save(screenshot: screenshot)
+        }
+
+        // Auto-paste mode: copy to clipboard, paste into previous app, skip editor
+        if autoPasteAfterCapture {
+            autoPasteAfterCapture = false
+            copyToClipboard(screenshot)
+            isCapturing = false
+            pasteToFrontApp()
+            NSLog("[ScreenCaptureService] completeCapture finished (auto-paste)")
+            return
         }
 
         // Auto copy to clipboard
@@ -600,6 +723,28 @@ class ScreenCaptureService: ObservableObject {
             }
         }
         NSLog("[ScreenCaptureService] showEditor returned")
+    }
+
+    // MARK: - Auto-Paste
+
+    /// Re-activate the previous app and simulate Cmd+V to paste the clipboard
+    private func pasteToFrontApp() {
+        guard let targetApp = previousApp else { return }
+
+        targetApp.activate(options: [])
+
+        // Small delay for app activation to complete
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            let source = CGEventSource(stateID: .hidSystemState)
+
+            let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 9, keyDown: true) // 9 = V
+            keyDown?.flags = .maskCommand
+            keyDown?.post(tap: .cgAnnotatedSessionEventTap)
+
+            let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 9, keyDown: false)
+            keyUp?.flags = .maskCommand
+            keyUp?.post(tap: .cgAnnotatedSessionEventTap)
+        }
     }
 
     // MARK: - Helpers
@@ -809,6 +954,124 @@ struct TimedCaptureCountdownView: View {
                 onComplete()
             }
         }
+    }
+}
+
+// MARK: - Screen Picker Modal View
+
+struct ScreenPickerModalView: View {
+    let onSelectScreen: (NSScreen) -> Void
+    let onSelectAll: () -> Void
+    let onCancel: () -> Void
+
+    @State private var hoveredIndex: Int? = nil
+    @State private var allHovered = false
+
+    private var screens: [NSScreen] { NSScreen.screens }
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Text("menu.selectScreen".localized)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.secondary)
+
+            VStack(spacing: 6) {
+                ForEach(Array(screens.enumerated()), id: \.offset) { index, screen in
+                    ScreenOptionButton(
+                        label: screenLabel(index: index, screen: screen),
+                        detail: screenDetail(screen: screen),
+                        isMain: screen == NSScreen.main,
+                        isHovered: hoveredIndex == index
+                    ) {
+                        onSelectScreen(screen)
+                    }
+                    .onHover { h in
+                        withAnimation(.easeInOut(duration: 0.12)) { hoveredIndex = h ? index : nil }
+                    }
+                }
+
+                // All Screens option
+                ScreenOptionButton(
+                    label: "menu.allScreens".localized,
+                    detail: allScreensDetail(),
+                    isMain: false,
+                    isHovered: allHovered
+                ) {
+                    onSelectAll()
+                }
+                .onHover { h in
+                    withAnimation(.easeInOut(duration: 0.12)) { allHovered = h }
+                }
+            }
+
+            Button("Cancel") {
+                onCancel()
+            }
+            .buttonStyle(.plain)
+            .foregroundColor(.secondary)
+            .font(.system(size: 12))
+        }
+        .padding(20)
+    }
+
+    private func screenLabel(index: Int, screen: NSScreen) -> String {
+        let name = screen.localizedName
+        if screen == NSScreen.main {
+            return "\(name) (" + "menu.mainScreen".localized + ")"
+        }
+        return name
+    }
+
+    private func screenDetail(screen: NSScreen) -> String {
+        let w = Int(screen.frame.width)
+        let h = Int(screen.frame.height)
+        let scale = Int(screen.backingScaleFactor)
+        if scale > 1 {
+            return "\(w)x\(h) @\(scale)x"
+        }
+        return "\(w)x\(h)"
+    }
+
+    private func allScreensDetail() -> String {
+        let union = screens.reduce(CGRect.null) { $0.union($1.frame) }
+        return "\(Int(union.width))x\(Int(union.height))"
+    }
+}
+
+struct ScreenOptionButton: View {
+    let label: String
+    let detail: String
+    let isMain: Bool
+    let isHovered: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Image(systemName: "display")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(isHovered ? .white : .green)
+                    .frame(width: 24)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(label)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(isHovered ? .white : .primary)
+                    Text(detail)
+                        .font(.system(size: 11))
+                        .foregroundColor(isHovered ? .white.opacity(0.7) : .secondary)
+                }
+
+                Spacer()
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isHovered ? Color.green : Color.primary.opacity(0.06))
+            )
+        }
+        .buttonStyle(.plain)
     }
 }
 

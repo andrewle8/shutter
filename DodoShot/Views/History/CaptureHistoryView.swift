@@ -48,11 +48,13 @@ class CaptureHistoryWindowController {
 // MARK: - Capture History View
 struct CaptureHistoryView: View {
     @ObservedObject private var captureService = ScreenCaptureService.shared
+    @ObservedObject private var historyStore = HistoryStore.shared
     @State private var selectedScreenshot: Screenshot?
     @State private var searchText = ""
     @State private var filterType: CaptureTypeFilter = .all
     @State private var sortOrder: SortOrder = .newest
     @State private var viewMode: ViewMode = .grid
+    @State private var loadedScreenshots: [UUID: Screenshot] = [:]
 
     enum CaptureTypeFilter: String, CaseIterable {
         case all
@@ -87,16 +89,16 @@ struct CaptureHistoryView: View {
         case list
     }
 
-    var filteredCaptures: [Screenshot] {
-        var captures = captureService.recentCaptures
+    var filteredEntries: [HistoryStore.HistoryEntry] {
+        var items = historyStore.entries
 
         // Filter by type
         if filterType != .all {
-            captures = captures.filter { screenshot in
+            items = items.filter { entry in
                 switch filterType {
-                case .area: return screenshot.captureType == .area
-                case .window: return screenshot.captureType == .window
-                case .fullscreen: return screenshot.captureType == .fullscreen
+                case .area: return entry.captureType == CaptureType.area.rawValue
+                case .window: return entry.captureType == CaptureType.window.rawValue
+                case .fullscreen: return entry.captureType == CaptureType.fullscreen.rawValue
                 case .all: return true
                 }
             }
@@ -105,12 +107,24 @@ struct CaptureHistoryView: View {
         // Sort
         switch sortOrder {
         case .newest:
-            captures = captures.sorted { $0.capturedAt > $1.capturedAt }
+            items = items.sorted { $0.capturedAt > $1.capturedAt }
         case .oldest:
-            captures = captures.sorted { $0.capturedAt < $1.capturedAt }
+            items = items.sorted { $0.capturedAt < $1.capturedAt }
         }
 
-        return captures
+        return items
+    }
+
+    /// Load a screenshot on demand, caching it in loadedScreenshots.
+    private func screenshot(for entry: HistoryStore.HistoryEntry) -> Screenshot? {
+        if let cached = loadedScreenshots[entry.id] { return cached }
+        if let loaded = historyStore.loadScreenshot(for: entry) {
+            DispatchQueue.main.async {
+                loadedScreenshots[entry.id] = loaded
+            }
+            return loaded
+        }
+        return nil
     }
 
     var body: some View {
@@ -126,7 +140,7 @@ struct CaptureHistoryView: View {
             Divider()
 
             // Content
-            if filteredCaptures.isEmpty {
+            if filteredEntries.isEmpty {
                 emptyState
             } else {
                 if viewMode == .grid {
@@ -256,8 +270,12 @@ struct CaptureHistoryView: View {
             )
 
             // Clear all button
-            if !captureService.recentCaptures.isEmpty {
-                Button(action: { captureService.clearRecents() }) {
+            if !historyStore.entries.isEmpty {
+                Button(action: {
+                    historyStore.clearAll()
+                    captureService.clearRecents()
+                    loadedScreenshots.removeAll()
+                }) {
                     Image(systemName: "trash")
                         .font(.system(size: 12))
                         .foregroundColor(.secondary)
@@ -278,13 +296,18 @@ struct CaptureHistoryView: View {
                 columns: [GridItem(.adaptive(minimum: 160, maximum: 200), spacing: 16)],
                 spacing: 16
             ) {
-                ForEach(filteredCaptures) { screenshot in
-                    HistoryGridItem(
-                        screenshot: screenshot,
-                        isSelected: selectedScreenshot?.id == screenshot.id,
-                        onSelect: { selectedScreenshot = screenshot },
-                        onDoubleClick: { openInEditor(screenshot) }
-                    )
+                ForEach(filteredEntries) { entry in
+                    if let screenshot = screenshot(for: entry) {
+                        HistoryGridItem(
+                            screenshot: screenshot,
+                            isSelected: selectedScreenshot?.id == screenshot.id,
+                            onSelect: { selectedScreenshot = screenshot },
+                            onDoubleClick: { openInEditor(screenshot) },
+                            onDelete: { deleteEntry(entry) }
+                        )
+                    } else {
+                        HistoryGridPlaceholder(entry: entry)
+                    }
                 }
             }
             .padding(16)
@@ -295,13 +318,16 @@ struct CaptureHistoryView: View {
     private var listView: some View {
         ScrollView {
             LazyVStack(spacing: 2) {
-                ForEach(filteredCaptures) { screenshot in
-                    HistoryListItem(
-                        screenshot: screenshot,
-                        isSelected: selectedScreenshot?.id == screenshot.id,
-                        onSelect: { selectedScreenshot = screenshot },
-                        onDoubleClick: { openInEditor(screenshot) }
-                    )
+                ForEach(filteredEntries) { entry in
+                    if let screenshot = screenshot(for: entry) {
+                        HistoryListItem(
+                            screenshot: screenshot,
+                            isSelected: selectedScreenshot?.id == screenshot.id,
+                            onSelect: { selectedScreenshot = screenshot },
+                            onDoubleClick: { openInEditor(screenshot) },
+                            onDelete: { deleteEntry(entry) }
+                        )
+                    }
                 }
             }
             .padding(.vertical, 8)
@@ -335,14 +361,14 @@ struct CaptureHistoryView: View {
     // MARK: - Status Bar
     private var statusBar: some View {
         HStack {
-            Text("\(filteredCaptures.count) capture\(filteredCaptures.count == 1 ? "" : "s")")
+            Text("\(filteredEntries.count) capture\(filteredEntries.count == 1 ? "" : "s")")
                 .font(.system(size: 11))
                 .foregroundColor(.secondary)
 
             Spacer()
 
             if let selected = selectedScreenshot {
-                Text("\(Int(selected.image.size.width))×\(Int(selected.image.size.height))")
+                Text("\(Int(selected.imageSize.width))×\(Int(selected.imageSize.height))")
                     .font(.system(size: 11, design: .monospaced))
                     .foregroundColor(.secondary)
             }
@@ -355,6 +381,15 @@ struct CaptureHistoryView: View {
     // MARK: - Actions
     private func openInEditor(_ screenshot: Screenshot) {
         AnnotationEditorWindowController.shared.showEditorAndSave(for: screenshot)
+    }
+
+    private func deleteEntry(_ entry: HistoryStore.HistoryEntry) {
+        historyStore.delete(id: entry.id)
+        captureService.recentCaptures.removeAll { $0.id == entry.id }
+        loadedScreenshots.removeValue(forKey: entry.id)
+        if selectedScreenshot?.id == entry.id {
+            selectedScreenshot = nil
+        }
     }
 }
 
@@ -377,11 +412,47 @@ struct ViewModeButton: View {
 }
 
 // MARK: - History Grid Item
+// MARK: - History Grid Placeholder (for entries whose PNG hasn't loaded yet)
+struct HistoryGridPlaceholder: View {
+    let entry: HistoryStore.HistoryEntry
+
+    var body: some View {
+        VStack(spacing: 8) {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.primary.opacity(0.06))
+                .frame(height: 120)
+                .overlay(
+                    ProgressView()
+                )
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(formatDate(entry.capturedAt))
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.primary)
+                Text("\(entry.width)x\(entry.height)")
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundColor(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(8)
+    }
+
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.doesRelativeDateFormatting = true
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
+}
+
 struct HistoryGridItem: View {
     let screenshot: Screenshot
     let isSelected: Bool
     let onSelect: () -> Void
     let onDoubleClick: () -> Void
+    var onDelete: (() -> Void)? = nil
 
     @State private var isHovered = false
 
@@ -467,7 +538,7 @@ struct HistoryGridItem: View {
                 Label(L10n.ContextMenu.pin, systemImage: "pin")
             }
             Divider()
-            Button(role: .destructive, action: { deleteScreenshot(screenshot) }) {
+            Button(role: .destructive, action: { onDelete?() }) {
                 Label(L10n.ContextMenu.delete, systemImage: "trash")
             }
         }
@@ -480,10 +551,6 @@ struct HistoryGridItem: View {
         formatter.timeStyle = .short
         return formatter.string(from: date)
     }
-
-    private func deleteScreenshot(_ screenshot: Screenshot) {
-        ScreenCaptureService.shared.recentCaptures.removeAll { $0.id == screenshot.id }
-    }
 }
 
 // MARK: - History List Item
@@ -492,6 +559,7 @@ struct HistoryListItem: View {
     let isSelected: Bool
     let onSelect: () -> Void
     let onDoubleClick: () -> Void
+    var onDelete: (() -> Void)? = nil
 
     @State private var isHovered = false
 
@@ -570,7 +638,7 @@ struct HistoryListItem: View {
                 Label(L10n.ContextMenu.pin, systemImage: "pin")
             }
             Divider()
-            Button(role: .destructive, action: { deleteScreenshot(screenshot) }) {
+            Button(role: .destructive, action: { onDelete?() }) {
                 Label(L10n.ContextMenu.delete, systemImage: "trash")
             }
         }
@@ -590,10 +658,6 @@ struct HistoryListItem: View {
         if bytes < 1024 { return "\(bytes) B" }
         if bytes < 1024 * 1024 { return "\(bytes / 1024) KB" }
         return String(format: "%.1f MB", Double(bytes) / (1024 * 1024))
-    }
-
-    private func deleteScreenshot(_ screenshot: Screenshot) {
-        ScreenCaptureService.shared.recentCaptures.removeAll { $0.id == screenshot.id }
     }
 }
 

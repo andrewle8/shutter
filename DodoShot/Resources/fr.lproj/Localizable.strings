@@ -20,6 +20,11 @@
 "menu.settings" = "Réglages";
 "menu.quit" = "Quitter Shutter";
 "menu.history" = "Historique";
+"menu.paste" = "Coller";
+"menu.ocrPaste" = "OCR Paste";
+"menu.selectScreen" = "Choisir un écran";
+"menu.allScreens" = "Tous les écrans";
+"menu.mainScreen" = "Principal";
 "menu.ready" = "Prêt à capturer";
 "menu.scrolling.description" = "Capturer des pages longues";
 "menu.clearHistory" = "Effacer l'historique";
@@ -87,6 +92,9 @@
 "settings.areaCapture" = "Capture de zone";
 "settings.windowCapture" = "Capture de fenêtre";
 "settings.fullscreenCapture" = "Capture plein écran";
+"settings.autoPasteCapture" = "Capture et collage auto";
+"settings.ocrPasteCapture" = "Capture OCR et collage";
+"settings.allScreensCapture" = "Capture de tous les écrans";
 "settings.recording" = "Enregistrement...";
 "settings.permissions" = "Autorisation d'accessibilité requise";
 "settings.permissions.description" = "Shutter nécessite l'accès à l'accessibilité pour les raccourcis globaux.";

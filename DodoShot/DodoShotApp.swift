@@ -27,6 +27,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         captureService = ScreenCaptureService.shared
         hotkeyManager = HotkeyManager.shared
 
+        // Load persistent history into the in-memory popover list
+        if SettingsManager.shared.settings.saveHistory {
+            HistoryStore.shared.loadIntoRecentCaptures()
+        }
+
         // Set activation policy based on user preference
         let showInDock = SettingsManager.shared.settings.showInDock
         NSApp.setActivationPolicy(showInDock ? .regular : .accessory)

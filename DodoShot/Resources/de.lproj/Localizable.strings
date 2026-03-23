@@ -20,6 +20,11 @@
 "menu.settings" = "Einstellungen";
 "menu.quit" = "Shutter beenden";
 "menu.history" = "Verlauf";
+"menu.paste" = "Einfügen";
+"menu.ocrPaste" = "OCR Paste";
+"menu.selectScreen" = "Bildschirm auswählen";
+"menu.allScreens" = "Alle Bildschirme";
+"menu.mainScreen" = "Haupt";
 "menu.ready" = "Bereit zum Aufnehmen";
 "menu.scrolling.description" = "Lange Seiten aufnehmen";
 "menu.clearHistory" = "Verlauf löschen";
@@ -87,6 +92,9 @@
 "settings.areaCapture" = "Bereichsaufnahme";
 "settings.windowCapture" = "Fensteraufnahme";
 "settings.fullscreenCapture" = "Vollbildaufnahme";
+"settings.autoPasteCapture" = "Auto-Einfügen-Aufnahme";
+"settings.ocrPasteCapture" = "OCR-Einfügen-Aufnahme";
+"settings.allScreensCapture" = "Alle Bildschirme aufnehmen";
 "settings.recording" = "Aufnahme...";
 "settings.permissions" = "Bedienungshilfen-Berechtigung erforderlich";
 "settings.permissions.description" = "Shutter benötigt Bedienungshilfen-Zugriff für globale Tastenkürzel.";

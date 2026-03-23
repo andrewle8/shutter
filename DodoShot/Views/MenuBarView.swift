@@ -160,6 +160,22 @@ struct MenuBarView: View {
             ) {
                 startOCRCapture()
             }
+
+            MenuToolButton(
+                icon: "doc.on.clipboard.fill",
+                label: L10n.Menu.paste,
+                color: .indigo
+            ) {
+                startCaptureAndPaste()
+            }
+
+            MenuToolButton(
+                icon: "doc.text.viewfinder",
+                label: L10n.Menu.ocrPaste,
+                color: .mint
+            ) {
+                startOCRCaptureAndPaste()
+            }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
@@ -265,6 +281,20 @@ struct MenuBarView: View {
         NSApp.sendAction(#selector(AppDelegate.closePopover), to: nil, from: nil)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
             ScreenCaptureService.shared.startOCRCapture()
+        }
+    }
+
+    private func startCaptureAndPaste() {
+        NSApp.sendAction(#selector(AppDelegate.closePopover), to: nil, from: nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            ScreenCaptureService.shared.startCaptureAndPaste(type: .area)
+        }
+    }
+
+    private func startOCRCaptureAndPaste() {
+        NSApp.sendAction(#selector(AppDelegate.closePopover), to: nil, from: nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            ScreenCaptureService.shared.startOCRCaptureAndPaste()
         }
     }
 

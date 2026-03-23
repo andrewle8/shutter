@@ -20,6 +20,11 @@
 "menu.settings" = "Ayarlar";
 "menu.quit" = "Shutter'tan Çık";
 "menu.history" = "Geçmiş";
+"menu.paste" = "Yapıştır";
+"menu.ocrPaste" = "OCR Paste";
+"menu.selectScreen" = "Ekran seç";
+"menu.allScreens" = "Tüm Ekranlar";
+"menu.mainScreen" = "Ana";
 "menu.ready" = "Yakalamaya hazır";
 "menu.scrolling.description" = "Uzun sayfaları yakala";
 "menu.clearHistory" = "Geçmişi temizle";
@@ -87,6 +92,9 @@
 "settings.areaCapture" = "Alan yakalama";
 "settings.windowCapture" = "Pencere yakalama";
 "settings.fullscreenCapture" = "Tam ekran yakalama";
+"settings.autoPasteCapture" = "Otomatik yapıştırma yakalama";
+"settings.ocrPasteCapture" = "OCR yapıştırma yakalama";
+"settings.allScreensCapture" = "Tüm ekranları yakala";
 "settings.recording" = "Kaydediliyor...";
 "settings.permissions" = "Erişilebilirlik izni gerekli";
 "settings.permissions.description" = "Shutter'un global kısayolları çalışması için erişilebilirlik izni gereklidir.";

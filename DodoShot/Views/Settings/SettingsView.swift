@@ -447,6 +447,36 @@ struct HotkeysSettingsTab: View {
                             iconColor: .green,
                             hotkey: $settingsManager.settings.hotkeys.fullscreenCapture
                         )
+
+                        Divider()
+                            .padding(.vertical, 12)
+
+                        HotkeyRow(
+                            label: L10n.Settings.autoPasteCapture,
+                            icon: "doc.on.clipboard.fill",
+                            iconColor: .indigo,
+                            hotkey: $settingsManager.settings.hotkeys.autoPasteCapture
+                        )
+
+                        Divider()
+                            .padding(.vertical, 12)
+
+                        HotkeyRow(
+                            label: L10n.Settings.ocrPasteCapture,
+                            icon: "doc.text.viewfinder",
+                            iconColor: .teal,
+                            hotkey: $settingsManager.settings.hotkeys.ocrPasteCapture
+                        )
+
+                        Divider()
+                            .padding(.vertical, 12)
+
+                        HotkeyRow(
+                            label: L10n.Settings.allScreensCapture,
+                            icon: "rectangle.on.rectangle",
+                            iconColor: .green,
+                            hotkey: $settingsManager.settings.hotkeys.allScreensCapture
+                        )
                     }
                 }
 

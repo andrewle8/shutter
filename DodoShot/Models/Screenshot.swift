@@ -408,7 +408,7 @@ struct AppSettings: Codable {
         case autoSaveOnEditorClose, autoCopyOnEditorClose, maxVideoRecordingDuration
         case defaultRedactionStyle, defaultRedactionIntensity, defaultStepCounterFormat
         case showInDock
-        case saveHistory
+        case saveHistory, maxHistoryItems
         // Legacy key for backward compatibility
         case llmApiKey
     }
@@ -460,6 +460,7 @@ struct AppSettings: Codable {
         defaultStepCounterFormat = try container.decodeIfPresent(StepCounterFormat.self, forKey: .defaultStepCounterFormat) ?? .numeric
         showInDock = try container.decodeIfPresent(Bool.self, forKey: .showInDock) ?? false
         saveHistory = try container.decodeIfPresent(Bool.self, forKey: .saveHistory) ?? true
+        maxHistoryItems = try container.decodeIfPresent(Int.self, forKey: .maxHistoryItems) ?? 100
     }
 
     // Custom encoder - don't encode the computed llmApiKey
@@ -491,6 +492,7 @@ struct AppSettings: Codable {
         try container.encode(defaultStepCounterFormat, forKey: .defaultStepCounterFormat)
         try container.encode(showInDock, forKey: .showInDock)
         try container.encode(saveHistory, forKey: .saveHistory)
+        try container.encode(maxHistoryItems, forKey: .maxHistoryItems)
     }
     var autoCopyToClipboard: Bool
     var hideDesktopIcons: Bool
@@ -514,6 +516,7 @@ struct AppSettings: Codable {
     var defaultStepCounterFormat: StepCounterFormat
     var showInDock: Bool
     var saveHistory: Bool
+    var maxHistoryItems: Int
 
     // Memberwise init (needed because we have custom Codable)
     init(
@@ -542,7 +545,8 @@ struct AppSettings: Codable {
         defaultRedactionIntensity: Double,
         defaultStepCounterFormat: StepCounterFormat,
         showInDock: Bool,
-        saveHistory: Bool
+        saveHistory: Bool,
+        maxHistoryItems: Int
     ) {
         self.anthropicApiKey = anthropicApiKey
         self.openaiApiKey = openaiApiKey
@@ -570,6 +574,7 @@ struct AppSettings: Codable {
         self.defaultStepCounterFormat = defaultStepCounterFormat
         self.showInDock = showInDock
         self.saveHistory = saveHistory
+        self.maxHistoryItems = maxHistoryItems
     }
 
     static var `default`: AppSettings {
@@ -602,7 +607,8 @@ struct AppSettings: Codable {
             defaultRedactionIntensity: 0.7,
             defaultStepCounterFormat: .numeric,
             showInDock: false,
-            saveHistory: true
+            saveHistory: true,
+            maxHistoryItems: 100
         )
     }
 
@@ -644,12 +650,41 @@ struct HotkeySettings: Codable {
     var areaCapture: String
     var windowCapture: String
     var fullscreenCapture: String
+    var autoPasteCapture: String
+    var ocrPasteCapture: String
+    var allScreensCapture: String
+
+    enum CodingKeys: String, CodingKey {
+        case areaCapture, windowCapture, fullscreenCapture, autoPasteCapture, ocrPasteCapture, allScreensCapture
+    }
+
+    init(areaCapture: String, windowCapture: String, fullscreenCapture: String, autoPasteCapture: String = "⌘⇧6", ocrPasteCapture: String = "⌘⇧7", allScreensCapture: String = "⌘⇧⌥3") {
+        self.areaCapture = areaCapture
+        self.windowCapture = windowCapture
+        self.fullscreenCapture = fullscreenCapture
+        self.autoPasteCapture = autoPasteCapture
+        self.ocrPasteCapture = ocrPasteCapture
+        self.allScreensCapture = allScreensCapture
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        areaCapture = try container.decode(String.self, forKey: .areaCapture)
+        windowCapture = try container.decode(String.self, forKey: .windowCapture)
+        fullscreenCapture = try container.decode(String.self, forKey: .fullscreenCapture)
+        autoPasteCapture = try container.decodeIfPresent(String.self, forKey: .autoPasteCapture) ?? "⌘⇧6"
+        ocrPasteCapture = try container.decodeIfPresent(String.self, forKey: .ocrPasteCapture) ?? "⌘⇧7"
+        allScreensCapture = try container.decodeIfPresent(String.self, forKey: .allScreensCapture) ?? "⌘⇧⌥3"
+    }
 
     static var `default`: HotkeySettings {
         HotkeySettings(
             areaCapture: "⌘⇧4",
             windowCapture: "⌘⇧5",
-            fullscreenCapture: "⌘⇧3"
+            fullscreenCapture: "⌘⇧3",
+            autoPasteCapture: "⌘⇧6",
+            ocrPasteCapture: "⌘⇧7",
+            allScreensCapture: "⌘⇧⌥3"
         )
     }
 }

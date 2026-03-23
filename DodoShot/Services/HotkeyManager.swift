@@ -94,6 +94,36 @@ class HotkeyManager {
             }
             hotkeyBindings[parsed.keyCode, default: []].append((parsed.modifiers, action))
         }
+
+        // Auto-paste capture (capture area -> clipboard -> Cmd+V into previous app)
+        if let parsed = HotkeyManager.parseHotkeyString(settings.autoPasteCapture) {
+            let action: () -> Void = {
+                DispatchQueue.main.async {
+                    ScreenCaptureService.shared.startCaptureAndPaste(type: .area)
+                }
+            }
+            hotkeyBindings[parsed.keyCode, default: []].append((parsed.modifiers, action))
+        }
+
+        // OCR paste capture
+        if let parsed = HotkeyManager.parseHotkeyString(settings.ocrPasteCapture) {
+            let action: () -> Void = {
+                DispatchQueue.main.async {
+                    ScreenCaptureService.shared.startOCRCaptureAndPaste()
+                }
+            }
+            hotkeyBindings[parsed.keyCode, default: []].append((parsed.modifiers, action))
+        }
+
+        // All screens capture
+        if let parsed = HotkeyManager.parseHotkeyString(settings.allScreensCapture) {
+            let action: () -> Void = {
+                DispatchQueue.main.async {
+                    ScreenCaptureService.shared.captureAllScreens()
+                }
+            }
+            hotkeyBindings[parsed.keyCode, default: []].append((parsed.modifiers, action))
+        }
     }
 
     private static func handleEvent(

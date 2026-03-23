@@ -20,6 +20,11 @@
 "menu.settings" = "Settings";
 "menu.quit" = "Quit Shutter";
 "menu.history" = "History";
+"menu.paste" = "Paste";
+"menu.ocrPaste" = "OCR Paste";
+"menu.selectScreen" = "Select screen";
+"menu.allScreens" = "All Screens";
+"menu.mainScreen" = "Main";
 "menu.ready" = "Ready to capture";
 "menu.scrolling.description" = "Capture long pages";
 "menu.clearHistory" = "Clear history";
@@ -87,6 +92,9 @@
 "settings.areaCapture" = "Area capture";
 "settings.windowCapture" = "Window capture";
 "settings.fullscreenCapture" = "Fullscreen capture";
+"settings.autoPasteCapture" = "Auto-paste capture";
+"settings.ocrPasteCapture" = "OCR paste capture";
+"settings.allScreensCapture" = "All screens capture";
 "settings.recording" = "Recording...";
 "settings.permissions" = "Accessibility permission required";
 "settings.permissions.description" = "Shutter needs accessibility access for global hotkeys to work.";
