@@ -83,7 +83,7 @@ struct PermissionOnboardingView: View {
                 )
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("DodoShot setup")
+                Text("Shutter setup")
                     .font(.system(size: 18, weight: .semibold))
 
                 Text("Step \(stepNumber) of 2")
@@ -138,7 +138,7 @@ struct PermissionOnboardingView: View {
                 Text("Screen recording")
                     .font(.system(size: 20, weight: .semibold))
 
-                Text("DodoShot needs screen recording permission to capture screenshots of your screen.")
+                Text("Shutter needs screen recording permission to capture screenshots of your screen.")
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -170,10 +170,10 @@ struct PermissionOnboardingView: View {
 
             // Help text
             VStack(spacing: 4) {
-                Text("Enable DodoShot in Privacy & Security → Screen Recording")
+                Text("Enable Shutter in Privacy & Security → Screen Recording")
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
-                Text("After enabling, restart DodoShot for changes to take effect")
+                Text("After enabling, restart Shutter for changes to take effect")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary.opacity(0.7))
             }
@@ -204,7 +204,7 @@ struct PermissionOnboardingView: View {
                 Text("Accessibility")
                     .font(.system(size: 20, weight: .semibold))
 
-                Text("DodoShot needs accessibility permission to enable global keyboard shortcuts.")
+                Text("Shutter needs accessibility permission to enable global keyboard shortcuts.")
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -282,7 +282,7 @@ struct PermissionOnboardingView: View {
                 Text("You're all set!")
                     .font(.system(size: 20, weight: .semibold))
 
-                Text("DodoShot is ready to use. Click the menu bar icon or use keyboard shortcuts to capture screenshots.")
+                Text("Shutter is ready to use. Click the menu bar icon or use keyboard shortcuts to capture screenshots.")
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -360,7 +360,7 @@ class PermissionOnboardingWindowController {
             defer: false
         )
 
-        window.title = "DodoShot Setup"
+        window.title = "Shutter Setup"
         window.titlebarAppearsTransparent = false
         window.titleVisibility = .visible
 

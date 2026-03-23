@@ -22,15 +22,15 @@ xcodebuild -exportArchive -archivePath build/DodoShot.xcarchive -exportPath rele
 
 **IMPORTANT:** Always reset permissions when deploying a new build to test the onboarding flow:
 ```bash
-tccutil reset ScreenCapture com.dodoshot.app
-tccutil reset Accessibility com.dodoshot.app
+tccutil reset ScreenCapture com.shutter.app
+tccutil reset Accessibility com.shutter.app
 ```
 
 There are no unit tests in this project. Requires Xcode 15+, macOS 14.0+ (Sonoma), Swift 5.9.
 
 ## Architecture
 
-Native macOS menu bar app built with SwiftUI + AppKit. Runs as a menu bar item (NSStatusItem) with left-click popover and right-click context menu. Uses `NSApplicationDelegateAdaptor` in `DodoShotApp.swift` to bridge SwiftUI app lifecycle with AppKit window management.
+Native macOS menu bar app built with SwiftUI + AppKit. Runs as a menu bar item (NSStatusItem) with left-click popover and right-click context menu. Uses `NSApplicationDelegateAdaptor` in `ShutterApp.swift` to bridge SwiftUI app lifecycle with AppKit window management.
 
 ### Singleton services (all use `static let shared`)
 
@@ -58,7 +58,7 @@ Native macOS menu bar app built with SwiftUI + AppKit. Runs as a menu bar item (
 
 ### File format
 
-`.dodo` project files are JSON-encoded `DodoShotProject` structs containing PNG image data + annotations. Backward-compatible decoding uses `decodeIfPresent` with defaults for newer fields.
+`.shutter` project files are JSON-encoded `ShutterProject` structs containing PNG image data + annotations. Backward-compatible decoding uses `decodeIfPresent` with defaults for newer fields.
 
 ## Required macOS permissions
 
@@ -72,4 +72,4 @@ The app polls for permission changes every 2 seconds until both are granted.
 - Swift API Design Guidelines, SwiftUI for all views
 - `@MainActor` on observable service classes
 - MARK comments for section organization
-- Bundle ID: `com.dodoshot.app`
+- Bundle ID: `com.shutter.app`

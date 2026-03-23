@@ -399,11 +399,11 @@ class ScreenCaptureService: ObservableObject {
             return
         }
 
-        // Auto-capture the frontmost window (first in the list, excluding DodoShot itself)
-        if let frontmostWindow = windows.first(where: { $0.ownerName != "DodoShot" }) {
+        // Auto-capture the frontmost window (first in the list, excluding Shutter itself)
+        if let frontmostWindow = windows.first(where: { $0.ownerName != "Shutter" }) {
             captureWindow(frontmostWindow)
         } else if let firstWindow = windows.first {
-            // Fallback to first window if all are DodoShot windows
+            // Fallback to first window if all are Shutter windows
             captureWindow(firstWindow)
         } else {
             isCapturing = false
@@ -619,7 +619,7 @@ class ScreenCaptureService: ObservableObject {
     private func getDefaultSaveURL() -> URL {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
-        let filename = "DodoShot_\(dateFormatter.string(from: Date())).png"
+        let filename = "Shutter_\(dateFormatter.string(from: Date())).png"
 
         let saveLocation = SettingsManager.shared.settings.saveLocation
         return URL(fileURLWithPath: saveLocation).appendingPathComponent(filename)

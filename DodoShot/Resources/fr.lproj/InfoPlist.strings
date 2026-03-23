@@ -1,7 +1,7 @@
 /*
   InfoPlist.strings
-  DodoShot - French (Français)
+  Shutter - French (Français)
 */
 
-"CFBundleDisplayName" = "DodoShot";
+"CFBundleDisplayName" = "Shutter";
 "NSHumanReadableCopyright" = "Copyright © 2024 Bluewave Labs. Tous droits réservés.";

@@ -1,6 +1,6 @@
 /*
   Localizable.strings
-  DodoShot - Turkish (Türkçe)
+  Shutter - Turkish (Türkçe)
 */
 
 // MARK: - Menu Bar
@@ -18,7 +18,7 @@
 "menu.noRecentCaptures" = "Son yakalama yok";
 "menu.showAll" = "Tümünü Göster";
 "menu.settings" = "Ayarlar";
-"menu.quit" = "DodoShot'tan Çık";
+"menu.quit" = "Shutter'tan Çık";
 "menu.history" = "Geçmiş";
 "menu.ready" = "Yakalamaya hazır";
 "menu.scrolling.description" = "Uzun sayfaları yakala";
@@ -67,7 +67,7 @@
 
 // Settings - General
 "settings.appearance" = "Görünüm";
-"settings.appearance.description" = "DodoShot'un nasıl görüneceğini seçin";
+"settings.appearance.description" = "Shutter'un nasıl görüneceğini seçin";
 "settings.appearance.system" = "Sistem";
 "settings.appearance.light" = "Açık";
 "settings.appearance.dark" = "Koyu";
@@ -89,7 +89,7 @@
 "settings.fullscreenCapture" = "Tam ekran yakalama";
 "settings.recording" = "Kaydediliyor...";
 "settings.permissions" = "Erişilebilirlik izni gerekli";
-"settings.permissions.description" = "DodoShot'un global kısayolları çalışması için erişilebilirlik izni gereklidir.";
+"settings.permissions.description" = "Shutter'un global kısayolları çalışması için erişilebilirlik izni gereklidir.";
 "settings.openSettings" = "Ayarları aç";
 
 // Settings - AI
@@ -130,7 +130,7 @@
 
 // MARK: - Permissions
 "permissions.title" = "İzinler Gerekli";
-"permissions.description" = "DodoShot'un ekran görüntüsü alması ve global kısayolları kullanması için Ekran Kaydı ve Erişilebilirlik izinleri gereklidir.";
+"permissions.description" = "Shutter'un ekran görüntüsü alması ve global kısayolları kullanması için Ekran Kaydı ve Erişilebilirlik izinleri gereklidir.";
 "permissions.screenRecording" = "Ekran Kaydı";
 "permissions.screenRecording.description" = "Ekran görüntüsü almak için gerekli";
 "permissions.accessibility" = "Erişilebilirlik";
@@ -141,9 +141,9 @@
 "permissions.restart" = "Yeniden Başlat";
 "permissions.later" = "Daha sonra yapacağım";
 "permissions.instructions" = "Zaten etkinse ancak çalışmıyorsa:";
-"permissions.step1" = "1. DodoShot'u izin listesinden kaldırın";
+"permissions.step1" = "1. Shutter'u izin listesinden kaldırın";
 "permissions.step2" = "2. \"Finder'da Göster\"e tıklayın ve uygulamayı geri sürükleyin";
-"permissions.step3" = "3. DodoShot'u yeniden başlatın";
+"permissions.step3" = "3. Shutter'u yeniden başlatın";
 
 // MARK: - Window Selection
 "windowSelection.title" = "Yakalanacak pencereyi seçin";

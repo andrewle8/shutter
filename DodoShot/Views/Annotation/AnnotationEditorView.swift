@@ -89,7 +89,7 @@ class AnnotationEditorWindowController {
             defer: false
         )
 
-        newWindow.title = "DodoShot - Edit screenshot"
+        newWindow.title = "Shutter - Edit screenshot"
         newWindow.titlebarAppearsTransparent = false
         newWindow.titleVisibility = .visible
         newWindow.backgroundColor = NSColor.windowBackgroundColor
@@ -1306,7 +1306,7 @@ struct AnnotationEditorView: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .help("Save as editable .dodo project file")
+                .help("Save as editable .shutter project file")
 
                 Button(action: saveImage) {
                     HStack(spacing: 5) {
@@ -1504,10 +1504,10 @@ struct AnnotationEditorView: View {
         projectScreenshot.annotations = annotations
 
         do {
-            let project = try DodoShotProject(screenshot: projectScreenshot)
+            let project = try ShutterProject(screenshot: projectScreenshot)
 
             let savePanel = NSSavePanel()
-            savePanel.allowedContentTypes = [.init(filenameExtension: "dodo")!]
+            savePanel.allowedContentTypes = [.init(filenameExtension: "shutter")!]
             savePanel.nameFieldStringValue = "Screenshot_\(DateFormatter.localizedString(from: Date(), dateStyle: .short, timeStyle: .short).replacingOccurrences(of: "/", with: "-").replacingOccurrences(of: ":", with: "-"))"
 
             if savePanel.runModal() == .OK, let url = savePanel.url {
@@ -1520,14 +1520,14 @@ struct AnnotationEditorView: View {
 
     static func openProject() -> Screenshot? {
         let openPanel = NSOpenPanel()
-        openPanel.allowedContentTypes = [.init(filenameExtension: "dodo")!]
+        openPanel.allowedContentTypes = [.init(filenameExtension: "shutter")!]
         openPanel.canChooseFiles = true
         openPanel.canChooseDirectories = false
         openPanel.allowsMultipleSelection = false
 
         if openPanel.runModal() == .OK, let url = openPanel.url {
             do {
-                let project = try DodoShotProject.load(from: url)
+                let project = try ShutterProject.load(from: url)
                 return project.toScreenshot()
             } catch {
                 print("Failed to load project: \(error)")

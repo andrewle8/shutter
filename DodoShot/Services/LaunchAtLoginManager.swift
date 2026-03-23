@@ -31,7 +31,7 @@ class LaunchAtLoginManager {
             }
         } else {
             // For older macOS versions, use the deprecated API
-            let bundleId = Bundle.main.bundleIdentifier ?? "com.dodoshot.DodoShot"
+            let bundleId = Bundle.main.bundleIdentifier ?? "com.shutter.Shutter"
             SMLoginItemSetEnabled(bundleId as CFString, enabled)
         }
     }

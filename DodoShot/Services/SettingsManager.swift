@@ -13,9 +13,17 @@ class SettingsManager: ObservableObject {
     }
 
     private let userDefaults = UserDefaults.standard
-    private let settingsKey = "DodoShotSettings"
+    private let settingsKey = "ShutterSettings"
 
     private init() {
+        // Migrate from old key if needed
+        if let oldData = userDefaults.data(forKey: "DodoShotSettings") {
+            if userDefaults.data(forKey: settingsKey) == nil {
+                userDefaults.set(oldData, forKey: settingsKey)
+            }
+            userDefaults.removeObject(forKey: "DodoShotSettings")
+        }
+
         if let data = userDefaults.data(forKey: settingsKey),
            let decoded = try? JSONDecoder().decode(AppSettings.self, from: data) {
             self.settings = decoded

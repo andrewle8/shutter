@@ -64,7 +64,7 @@ struct MenuBarView: View {
             }
 
             VStack(alignment: .leading, spacing: 1) {
-                Text("DodoShot")
+                Text("Shutter")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.primary)
 

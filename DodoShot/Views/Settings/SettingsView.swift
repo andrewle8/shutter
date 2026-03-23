@@ -51,7 +51,7 @@ struct GeneralSettingsTab: View {
                     SettingsToggleRow(
                         icon: "arrow.clockwise",
                         title: "Launch at login",
-                        description: "Automatically start DodoShot when you log in",
+                        description: "Automatically start Shutter when you log in",
                         isOn: Binding(
                             get: { settingsManager.settings.launchAtStartup },
                             set: { newValue in
@@ -64,7 +64,7 @@ struct GeneralSettingsTab: View {
                     SettingsToggleRow(
                         icon: "dock.rectangle",
                         title: "Show in Dock",
-                        description: "Show DodoShot in the Dock and Cmd-Tab switcher. Changes apply on next launch.",
+                        description: "Show Shutter in the Dock and Cmd-Tab switcher. Changes apply on next launch.",
                         isOn: Binding(
                             get: { settingsManager.settings.showInDock },
                             set: { newValue in
@@ -902,7 +902,7 @@ struct AboutTab: View {
 
             // App name and version
             VStack(spacing: 6) {
-                Text("DodoShot")
+                Text("Shutter")
                     .font(.system(size: 28, weight: .bold))
 
                 Text(L10n.Settings.version("1.2.1"))
@@ -961,8 +961,8 @@ struct AboutTab: View {
 
             Spacer()
 
-            // Footer - Made by Dr. Gorkem Cetin
-            Text("Made by Dr. Gorkem Cetin")
+            // Footer - Made by Andrew Le
+            Text("Made by Andrew Le")
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(.secondary)
         }
@@ -971,7 +971,7 @@ struct AboutTab: View {
     }
 
     private func openGitHub() {
-        if let url = URL(string: "https://github.com/bluewave-labs/DodoShot") {
+        if let url = URL(string: "https://github.com/andrewle8/shutter") {
             NSWorkspace.shared.open(url)
         }
     }

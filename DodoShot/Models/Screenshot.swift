@@ -177,7 +177,7 @@ struct Annotation: Identifiable, Codable {
         case id, type, startPoint, endPoint, colorHex, strokeWidth, text, points, fontSize, fontWeight, fontName, calloutArrowDirection, stepNumber, stepCounterFormat, redactionStyle, redactionIntensity, zIndex
     }
 
-    // Custom decoder to handle missing keys from older .dodo files
+    // Custom decoder to handle missing keys from older .shutter files
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(UUID.self, forKey: .id)
@@ -450,7 +450,7 @@ struct AppSettings: Codable {
         defaultStrokeWidth = try container.decodeIfPresent(Double.self, forKey: .defaultStrokeWidth) ?? 3.0
         defaultAnnotationTool = try container.decodeIfPresent(String.self, forKey: .defaultAnnotationTool) ?? "arrow"
         textAnnotationSettings = try container.decodeIfPresent(TextAnnotationSettings.self, forKey: .textAnnotationSettings) ?? .default
-        filenameTemplate = try container.decodeIfPresent(String.self, forKey: .filenameTemplate) ?? "DodoShot_{date}_{time}"
+        filenameTemplate = try container.decodeIfPresent(String.self, forKey: .filenameTemplate) ?? "Shutter_{date}_{time}"
         sequentialNumber = try container.decodeIfPresent(Int.self, forKey: .sequentialNumber) ?? 1
         autoSaveOnEditorClose = try container.decodeIfPresent(Bool.self, forKey: .autoSaveOnEditorClose) ?? false
         autoCopyOnEditorClose = try container.decodeIfPresent(Bool.self, forKey: .autoCopyOnEditorClose) ?? true
@@ -593,7 +593,7 @@ struct AppSettings: Codable {
             defaultStrokeWidth: 3.0,
             defaultAnnotationTool: "arrow",
             textAnnotationSettings: .default,
-            filenameTemplate: "DodoShot_{date}_{time}",
+            filenameTemplate: "Shutter_{date}_{time}",
             sequentialNumber: 1,
             autoSaveOnEditorClose: false,
             autoCopyOnEditorClose: true,
@@ -688,11 +688,11 @@ extension NSColor {
     }
 }
 
-// MARK: - DodoShot Project File Format (.dodo)
+// MARK: - Shutter Project File Format (.shutter)
 /// A file format that stores the screenshot image and annotations together
-struct DodoShotProject: Codable {
-    static let fileExtension = "dodo"
-    static let utType = "com.dodoshot.project"
+struct ShutterProject: Codable {
+    static let fileExtension = "shutter"
+    static let utType = "com.shutter.project"
 
     let version: Int
     let createdAt: Date
@@ -778,15 +778,15 @@ struct DodoShotProject: Codable {
     }
 
     /// Load project from file
-    static func load(from url: URL) throws -> DodoShotProject {
+    static func load(from url: URL) throws -> ShutterProject {
         let data = try Data(contentsOf: url)
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        return try decoder.decode(DodoShotProject.self, from: data)
+        return try decoder.decode(ShutterProject.self, from: data)
     }
 }
 
-enum DodoShotProjectError: Error, LocalizedError {
+enum ShutterProjectError: Error, LocalizedError {
     case imageConversionFailed
     case invalidFileFormat
 
@@ -795,7 +795,7 @@ enum DodoShotProjectError: Error, LocalizedError {
         case .imageConversionFailed:
             return "Failed to convert image to PNG format"
         case .invalidFileFormat:
-            return "Invalid DodoShot project file"
+            return "Invalid Shutter project file"
         }
     }
 }

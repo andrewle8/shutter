@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="icon.png" alt="DodoShot Logo" width="120" height="120">
+  <img src="icon.png" alt="Shutter Logo" width="120" height="120">
 </p>
 
-<h1 align="center">DodoShot</h1>
+<h1 align="center">Shutter</h1>
 
 <p align="center">
   <strong>A beautiful, open-source screenshot tool for macOS</strong>
@@ -29,7 +29,7 @@
 
 ## About
 
-DodoShot is a lightweight, native macOS screenshot application built with SwiftUI. Inspired by CleanShot X, it provides a beautiful and intuitive interface for capturing, annotating, and managing screenshots — completely free and open source.
+Shutter is a lightweight, native macOS screenshot application built with SwiftUI. Inspired by CleanShot X, it provides a beautiful and intuitive interface for capturing, annotating, and managing screenshots — completely free and open source.
 
 ## Features
 
@@ -108,29 +108,29 @@ DodoShot is a lightweight, native macOS screenshot application built with SwiftU
 
 ### Homebrew (Recommended)
 ```bash
-brew tap DodoApps/tap
-brew install --cask dodoshot
-xattr -cr /Applications/DodoShot.app
+brew tap andrewle8/tap
+brew install --cask shutter
+xattr -cr /Applications/Shutter.app
 ```
 
 > **Note:** The `xattr` command removes the quarantine flag. This is required because the app is not signed with an Apple Developer certificate.
 
 ### Download DMG
-1. Download the latest DMG from [Releases](https://github.com/DodoApps/dodoshot/releases)
-2. Open the DMG and drag DodoShot to Applications
+1. Download the latest DMG from [Releases](https://github.com/andrewle8/shutter/releases)
+2. Open the DMG and drag Shutter to Applications
 3. **Important:** Run this command in Terminal to remove the quarantine flag:
    ```bash
-   xattr -cr /Applications/DodoShot.app
+   xattr -cr /Applications/Shutter.app
    ```
-4. Launch DodoShot from Applications
+4. Launch Shutter from Applications
 
 > **Note:** The `xattr` command is required because the app is not signed with an Apple Developer certificate. This is safe for open-source software where you can verify the source code.
 
 ### Build from source
 1. Clone the repository:
    ```bash
-   git clone https://github.com/DodoApps/dodoshot.git
-   cd dodoshot/DodoShot
+   git clone https://github.com/andrewle8/shutter.git
+   cd shutter/DodoShot
    ```
 
 2. Open in Xcode:
@@ -142,7 +142,7 @@ xattr -cr /Applications/DodoShot.app
 
 ## Usage
 
-1. Launch DodoShot — it runs in your menu bar
+1. Launch Shutter — it runs in your menu bar
 2. Click the menu bar icon or use keyboard shortcuts
 3. Select a capture mode
 4. After capture, use the quick overlay to:
@@ -225,4 +225,4 @@ Contributions are welcome! Here's how you can help:
 
 ## License
 
-DodoShot is released under the MIT License. See [LICENSE](LICENSE) for details.
+Shutter is released under the MIT License. See [LICENSE](LICENSE) for details.

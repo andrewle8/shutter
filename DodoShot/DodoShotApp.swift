@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 @main
-struct DodoShotApp: App {
+struct ShutterApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
@@ -79,15 +79,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     func application(_ application: NSApplication, open urls: [URL]) {
         for url in urls {
-            if url.pathExtension.lowercased() == "dodo" {
-                openDodoProject(at: url)
+            if url.pathExtension.lowercased() == "shutter" {
+                openShutterProject(at: url)
             }
         }
     }
 
-    private func openDodoProject(at url: URL) {
+    private func openShutterProject(at url: URL) {
         do {
-            let project = try DodoShotProject.load(from: url)
+            let project = try ShutterProject.load(from: url)
             if let screenshot = project.toScreenshot() {
                 // Screenshot stores image as Data internally, so no deep copy needed
                 AnnotationEditorWindowController.shared.showEditor(for: screenshot) { updatedScreenshot in
@@ -119,7 +119,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         // Log termination for debugging
-        print("DodoShot: applicationShouldTerminate called")
+        print("Shutter: applicationShouldTerminate called")
         Thread.callStackSymbols.forEach { print($0) }
         return .terminateNow
     }
@@ -129,7 +129,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         if let button = statusItem.button {
             let config = NSImage.SymbolConfiguration(pointSize: 12, weight: .medium)
-            if let image = NSImage(systemSymbolName: "camera.viewfinder", accessibilityDescription: "DodoShot")?.withSymbolConfiguration(config) {
+            if let image = NSImage(systemSymbolName: "camera.viewfinder", accessibilityDescription: "Shutter")?.withSymbolConfiguration(config) {
                 image.isTemplate = true
                 button.image = image
             }
@@ -167,7 +167,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ","))
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "Quit DodoShot", action: #selector(quitApp), keyEquivalent: "q"))
+        menu.addItem(NSMenuItem(title: "Quit Shutter", action: #selector(quitApp), keyEquivalent: "q"))
 
         statusItem.menu = nil // We'll show it manually on right-click
     }
@@ -216,7 +216,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        let quitItem = NSMenuItem(title: "Quit DodoShot", action: #selector(quitApp), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: "Quit Shutter", action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
 
@@ -265,7 +265,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "DodoShot Settings"
+        window.title = "Shutter Settings"
         window.backgroundColor = NSColor.windowBackgroundColor
         window.collectionBehavior = [.managed, .participatesInCycle]
         window.isReleasedWhenClosed = false

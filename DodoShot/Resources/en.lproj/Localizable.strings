@@ -1,6 +1,6 @@
 /*
   Localizable.strings
-  DodoShot - English
+  Shutter - English
 */
 
 // MARK: - Menu Bar
@@ -18,7 +18,7 @@
 "menu.noRecentCaptures" = "No recent captures";
 "menu.showAll" = "Show All";
 "menu.settings" = "Settings";
-"menu.quit" = "Quit DodoShot";
+"menu.quit" = "Quit Shutter";
 "menu.history" = "History";
 "menu.ready" = "Ready to capture";
 "menu.scrolling.description" = "Capture long pages";
@@ -67,7 +67,7 @@
 
 // Settings - General
 "settings.appearance" = "Appearance";
-"settings.appearance.description" = "Choose how DodoShot looks";
+"settings.appearance.description" = "Choose how Shutter looks";
 "settings.appearance.system" = "System";
 "settings.appearance.light" = "Light";
 "settings.appearance.dark" = "Dark";
@@ -89,7 +89,7 @@
 "settings.fullscreenCapture" = "Fullscreen capture";
 "settings.recording" = "Recording...";
 "settings.permissions" = "Accessibility permission required";
-"settings.permissions.description" = "DodoShot needs accessibility access for global hotkeys to work.";
+"settings.permissions.description" = "Shutter needs accessibility access for global hotkeys to work.";
 "settings.openSettings" = "Open settings";
 
 // Settings - AI
@@ -130,7 +130,7 @@
 
 // MARK: - Permissions
 "permissions.title" = "Permissions Required";
-"permissions.description" = "DodoShot needs Screen Recording and Accessibility permissions to capture screenshots and use global hotkeys.";
+"permissions.description" = "Shutter needs Screen Recording and Accessibility permissions to capture screenshots and use global hotkeys.";
 "permissions.screenRecording" = "Screen Recording";
 "permissions.screenRecording.description" = "Required to capture screenshots";
 "permissions.accessibility" = "Accessibility";
@@ -141,9 +141,9 @@
 "permissions.restart" = "Restart";
 "permissions.later" = "I'll do this later";
 "permissions.instructions" = "If already enabled but not working:";
-"permissions.step1" = "1. Remove DodoShot from the permission list";
+"permissions.step1" = "1. Remove Shutter from the permission list";
 "permissions.step2" = "2. Click \"Show in Finder\" and drag the app back";
-"permissions.step3" = "3. Restart DodoShot";
+"permissions.step3" = "3. Restart Shutter";
 
 // MARK: - Window Selection
 "windowSelection.title" = "Select a window to capture";
