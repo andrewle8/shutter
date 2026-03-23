@@ -236,6 +236,10 @@ struct AnnotationEditorView: View {
     @State private var showAIDescription = false
     @State private var hasLLMApiKey = false
 
+    // Undo/Redo state - stores full annotation snapshots
+    @State private var undoStack: [[Annotation]] = []
+    @State private var redoStack: [[Annotation]] = []
+
     // HUD feedback state
     @State private var showCopiedHUD = false
     @State private var showSavedHUD = false
@@ -339,6 +343,7 @@ struct AnnotationEditorView: View {
 
     private func deleteSelectedAnnotation() {
         if let selectedId = selectedAnnotationId {
+            pushUndoState()
             annotations.removeAll { $0.id == selectedId }
             selectedAnnotationId = nil
         }
@@ -347,6 +352,7 @@ struct AnnotationEditorView: View {
     private func updateSelectedAnnotationStrokeWidth(_ newWidth: CGFloat) {
         if let selectedId = selectedAnnotationId,
            let index = annotations.firstIndex(where: { $0.id == selectedId }) {
+            pushUndoState()
             annotations[index].strokeWidth = newWidth
         }
     }
@@ -354,6 +360,7 @@ struct AnnotationEditorView: View {
     private func updateSelectedAnnotationColor(_ newColor: Color) {
         if let selectedId = selectedAnnotationId,
            let index = annotations.firstIndex(where: { $0.id == selectedId }) {
+            pushUndoState()
             annotations[index].color = NSColor(newColor)
         }
     }
@@ -366,6 +373,7 @@ struct AnnotationEditorView: View {
               let index = annotations.firstIndex(where: { $0.id == selectedId }),
               index < annotations.count - 1 else { return }
 
+        pushUndoState()
         annotations.swapAt(index, index + 1)
         updateZIndices()
     }
@@ -376,6 +384,7 @@ struct AnnotationEditorView: View {
               let index = annotations.firstIndex(where: { $0.id == selectedId }),
               index > 0 else { return }
 
+        pushUndoState()
         annotations.swapAt(index, index - 1)
         updateZIndices()
     }
@@ -385,6 +394,7 @@ struct AnnotationEditorView: View {
         guard let selectedId = selectedAnnotationId,
               let index = annotations.firstIndex(where: { $0.id == selectedId }) else { return }
 
+        pushUndoState()
         let annotation = annotations.remove(at: index)
         annotations.append(annotation)
         updateZIndices()
@@ -395,6 +405,7 @@ struct AnnotationEditorView: View {
         guard let selectedId = selectedAnnotationId,
               let index = annotations.firstIndex(where: { $0.id == selectedId }) else { return }
 
+        pushUndoState()
         let annotation = annotations.remove(at: index)
         annotations.insert(annotation, at: 0)
         updateZIndices()
@@ -560,6 +571,29 @@ struct AnnotationEditorView: View {
                     onUndo: {
                         undo()
                     },
+                    onRedo: {
+                        redo()
+                    },
+                    onDuplicate: {
+                        duplicateSelectedAnnotation()
+                    },
+                    onNudge: { dx, dy in
+                        nudgeSelectedAnnotation(dx: dx, dy: dy)
+                    },
+                    onToolSelected: { tool in
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            selectedTool = tool
+                        }
+                    },
+                    onBringToFront: {
+                        bringToFront()
+                    },
+                    onSendToBack: {
+                        sendToBack()
+                    },
+                    onPushUndoState: {
+                        pushUndoState()
+                    },
                     onColorPicked: { color, hex in
                         hoveredColor = color
                         hoveredColorHex = hex
@@ -629,6 +663,7 @@ struct AnnotationEditorView: View {
     }
 
     private func addTextAnnotationDirect(text: String, position: CGPoint) {
+        pushUndoState()
         let annotation = Annotation(
             type: .text,
             startPoint: position,
@@ -934,21 +969,59 @@ struct AnnotationEditorView: View {
         .animation(.spring(response: 0.3), value: showSavedHUD)
     }
 
+    // MARK: - Tool Divider
+    private var toolDivider: some View {
+        Rectangle()
+            .fill(Color.primary.opacity(0.12))
+            .frame(width: 1, height: 20)
+            .padding(.horizontal, 2)
+    }
+
     // MARK: - Toolbar
     private var toolbar: some View {
         HStack(spacing: 16) {
-            // Tool selection
+            // Tool selection - grouped with dividers
+            // Select | Draw (Arrow, Line, Rect, Ellipse) | Mark (Text, Step, Highlight) | Redact (Blur, Pixelate) | Free (Pencil, Erase)
             HStack(spacing: 2) {
-                ForEach(AnnotationType.allCases, id: \.self) { tool in
-                    AnnotationToolButton(
-                        tool: tool,
-                        isSelected: selectedTool == tool,
-                        action: {
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                selectedTool = tool
-                            }
-                        }
-                    )
+                // Select
+                AnnotationToolButton(tool: .select, isSelected: selectedTool == .select) {
+                    withAnimation(.easeInOut(duration: 0.15)) { selectedTool = .select }
+                }
+
+                toolDivider
+
+                // Draw group
+                ForEach([AnnotationType.arrow, .line, .rectangle, .ellipse], id: \.self) { tool in
+                    AnnotationToolButton(tool: tool, isSelected: selectedTool == tool) {
+                        withAnimation(.easeInOut(duration: 0.15)) { selectedTool = tool }
+                    }
+                }
+
+                toolDivider
+
+                // Mark group
+                ForEach([AnnotationType.text, .stepCounter, .highlight], id: \.self) { tool in
+                    AnnotationToolButton(tool: tool, isSelected: selectedTool == tool) {
+                        withAnimation(.easeInOut(duration: 0.15)) { selectedTool = tool }
+                    }
+                }
+
+                toolDivider
+
+                // Redact group
+                ForEach([AnnotationType.blur, .pixelate], id: \.self) { tool in
+                    AnnotationToolButton(tool: tool, isSelected: selectedTool == tool) {
+                        withAnimation(.easeInOut(duration: 0.15)) { selectedTool = tool }
+                    }
+                }
+
+                toolDivider
+
+                // Free group
+                ForEach([AnnotationType.freehand, .erase], id: \.self) { tool in
+                    AnnotationToolButton(tool: tool, isSelected: selectedTool == tool) {
+                        withAnimation(.easeInOut(duration: 0.15)) { selectedTool = tool }
+                    }
                 }
             }
             .padding(4)
@@ -1114,13 +1187,20 @@ struct AnnotationEditorView: View {
                 .fill(Color.primary.opacity(0.1))
                 .frame(width: 1, height: 28)
 
-            // Undo/Clear
+            // Undo/Redo/Clear
             HStack(spacing: 6) {
                 ToolbarActionButton(
                     icon: "arrow.uturn.backward",
                     label: L10n.Annotation.undo,
-                    isDisabled: annotations.isEmpty,
+                    isDisabled: undoStack.isEmpty,
                     action: undo
+                )
+
+                ToolbarActionButton(
+                    icon: "arrow.uturn.forward",
+                    label: "Redo",
+                    isDisabled: redoStack.isEmpty,
+                    action: redo
                 )
 
                 ToolbarActionButton(
@@ -1336,17 +1416,79 @@ struct AnnotationEditorView: View {
         )
     }
 
+    // MARK: - Undo/Redo State Management
+
+    /// Save current annotation state to the undo stack before making a change.
+    private func pushUndoState() {
+        undoStack.append(annotations)
+        redoStack.removeAll()
+    }
+
     // MARK: - Actions
     private func undo() {
-        guard !annotations.isEmpty else { return }
+        guard !undoStack.isEmpty else { return }
         withAnimation(.easeInOut(duration: 0.2)) {
-            _ = annotations.removeLast()
+            redoStack.append(annotations)
+            annotations = undoStack.removeLast()
+        }
+    }
+
+    private func redo() {
+        guard !redoStack.isEmpty else { return }
+        withAnimation(.easeInOut(duration: 0.2)) {
+            undoStack.append(annotations)
+            annotations = redoStack.removeLast()
         }
     }
 
     private func clearAll() {
+        pushUndoState()
         withAnimation(.easeInOut(duration: 0.2)) {
             annotations.removeAll()
+        }
+    }
+
+    /// Duplicate the currently selected annotation, offset by (10,10).
+    private func duplicateSelectedAnnotation() {
+        guard let selectedId = selectedAnnotationId,
+              let index = annotations.firstIndex(where: { $0.id == selectedId }) else { return }
+        pushUndoState()
+        let original = annotations[index]
+        let copy = Annotation(
+            type: original.type,
+            startPoint: CGPoint(x: original.startPoint.x + 10, y: original.startPoint.y + 10),
+            endPoint: CGPoint(x: original.endPoint.x + 10, y: original.endPoint.y + 10),
+            color: original.color,
+            strokeWidth: original.strokeWidth,
+            text: original.text,
+            points: original.points.map { CGPoint(x: $0.x + 10, y: $0.y + 10) },
+            fontSize: original.fontSize,
+            fontWeight: original.fontWeight,
+            fontName: original.fontName,
+            calloutArrowDirection: original.calloutArrowDirection,
+            stepNumber: original.stepNumber,
+            stepCounterFormat: original.stepCounterFormat,
+            redactionStyle: original.redactionStyle,
+            redactionIntensity: original.redactionIntensity,
+            zIndex: annotations.count
+        )
+        annotations.append(copy)
+        selectedAnnotationId = copy.id
+    }
+
+    /// Nudge the selected annotation by a delta.
+    private func nudgeSelectedAnnotation(dx: CGFloat, dy: CGFloat) {
+        guard let selectedId = selectedAnnotationId,
+              let index = annotations.firstIndex(where: { $0.id == selectedId }) else { return }
+        pushUndoState()
+        annotations[index].startPoint.x += dx
+        annotations[index].startPoint.y += dy
+        annotations[index].endPoint.x += dx
+        annotations[index].endPoint.y += dy
+        if annotations[index].type == .freehand || annotations[index].type == .erase {
+            annotations[index].points = annotations[index].points.map {
+                CGPoint(x: $0.x + dx, y: $0.y + dy)
+            }
         }
     }
 
@@ -1360,6 +1502,7 @@ struct AnnotationEditorView: View {
     private func addTextAnnotation() {
         guard !currentText.isEmpty else { return }
 
+        pushUndoState()
         let annotation = Annotation(
             type: .text,
             startPoint: textPosition,
@@ -1963,18 +2106,18 @@ struct AnnotationToolButton: View {
 
     private var toolName: String {
         switch tool {
-        case .select: return "Select (to delete)"
-        case .arrow: return "Arrow"
-        case .rectangle: return "Rectangle"
-        case .ellipse: return "Circle"
-        case .line: return "Line"
-        case .text: return "Text"
-        case .blur: return "Blur"
+        case .select: return "Select (V)"
+        case .arrow: return "Arrow (A)"
+        case .rectangle: return "Rectangle (R)"
+        case .ellipse: return "Ellipse (E)"
+        case .line: return "Line (L)"
+        case .text: return "Text (T)"
+        case .blur: return "Blur (B)"
         case .pixelate: return "Pixelate"
-        case .highlight: return "Highlight"
-        case .freehand: return "Draw"
-        case .erase: return "Erase"
-        case .stepCounter: return "Step"
+        case .highlight: return "Highlight (H)"
+        case .freehand: return "Draw (P)"
+        case .erase: return "Erase (X)"
+        case .stepCounter: return "Step (S)"
         }
     }
 
@@ -2149,6 +2292,13 @@ struct AnnotationCanvasView: NSViewRepresentable {
     let onSelectAnnotation: (CGPoint) -> Void
     let onDeleteSelected: () -> Void
     let onUndo: () -> Void
+    var onRedo: (() -> Void)?
+    var onDuplicate: (() -> Void)?
+    var onNudge: ((CGFloat, CGFloat) -> Void)?
+    var onToolSelected: ((AnnotationType) -> Void)?
+    var onBringToFront: (() -> Void)?
+    var onSendToBack: (() -> Void)?
+    var onPushUndoState: (() -> Void)?
     var onColorPicked: ((Color, String) -> Void)?
     var onTextAdded: ((String, CGPoint) -> Void)?
 
@@ -2171,6 +2321,12 @@ struct AnnotationCanvasView: NSViewRepresentable {
         nsView.selectedAnnotationId = selectedAnnotationId
         nsView.onDeleteSelected = onDeleteSelected
         nsView.onUndo = onUndo
+        nsView.onRedo = onRedo
+        nsView.onDuplicate = onDuplicate
+        nsView.onNudge = onNudge
+        nsView.onToolSelected = onToolSelected
+        nsView.onBringToFront = onBringToFront
+        nsView.onSendToBack = onSendToBack
         nsView.onColorPicked = onColorPicked
         nsView.onTextAdded = onTextAdded
         nsView.needsDisplay = true
@@ -2210,6 +2366,8 @@ struct AnnotationCanvasView: NSViewRepresentable {
                    let index = parent.annotations.firstIndex(where: { $0.id == selectedId }) {
                     let annotation = parent.annotations[index]
                     if annotationContainsPoint(annotation, point: point) {
+                        // Push undo state before starting drag
+                        parent.onPushUndoState?()
                         // Start dragging the selected annotation
                         isDraggingAnnotation = true
                         draggedAnnotationIndex = index
@@ -2303,6 +2461,7 @@ struct AnnotationCanvasView: NSViewRepresentable {
                 let isStepCounter = currentTool == .stepCounter
 
                 if hasSize || hasFreehandMovement || isStepCounter {
+                    parent.onPushUndoState?()
                     parent.annotations.append(annotation)
                 }
                 parent.currentAnnotation = nil
@@ -2421,6 +2580,12 @@ class AnnotationCanvasNSView: NSView, NSTextFieldDelegate {
     var strokeWidth: CGFloat = 3.0
     var selectedAnnotationId: UUID?
     var onDeleteSelected: (() -> Void)?
+    var onRedo: (() -> Void)?
+    var onDuplicate: (() -> Void)?
+    var onNudge: ((CGFloat, CGFloat) -> Void)?
+    var onToolSelected: ((AnnotationType) -> Void)?
+    var onBringToFront: (() -> Void)?
+    var onSendToBack: (() -> Void)?
     var onColorPicked: ((Color, String) -> Void)?
     var onTextAdded: ((String, CGPoint) -> Void)?
     var sourceImage: NSImage?
@@ -2631,6 +2796,9 @@ class AnnotationCanvasNSView: NSView, NSTextFieldDelegate {
     var onUndo: (() -> Void)?
 
     override func keyDown(with event: NSEvent) {
+        // Don't intercept keys when a text field is being edited
+        if textField != nil { super.keyDown(with: event); return }
+
         // Handle Delete and Backspace keys
         if event.keyCode == 51 || event.keyCode == 117 { // Backspace or Delete
             if selectedAnnotationId != nil {
@@ -2638,15 +2806,69 @@ class AnnotationCanvasNSView: NSView, NSTextFieldDelegate {
                 return
             }
         }
+
+        // Arrow key nudging for selected annotations
+        if selectedAnnotationId != nil {
+            let shiftHeld = event.modifierFlags.contains(.shift)
+            let step: CGFloat = shiftHeld ? 10 : 1
+            switch event.keyCode {
+            case 123: onNudge?(-step, 0); return   // Left
+            case 124: onNudge?(step, 0); return     // Right
+            case 125: onNudge?(0, step); return     // Down
+            case 126: onNudge?(0, -step); return    // Up
+            default: break
+            }
+        }
+
+        // Single-key tool shortcuts (no modifier)
+        if event.modifierFlags.intersection([.command, .option, .control]).isEmpty,
+           let chars = event.charactersIgnoringModifiers?.lowercased() {
+            switch chars {
+            case "v": onToolSelected?(.select); return
+            case "a": onToolSelected?(.arrow); return
+            case "r": onToolSelected?(.rectangle); return
+            case "e": onToolSelected?(.ellipse); return
+            case "l": onToolSelected?(.line); return
+            case "t": onToolSelected?(.text); return
+            case "b": onToolSelected?(.blur); return
+            case "p": onToolSelected?(.freehand); return
+            case "h": onToolSelected?(.highlight); return
+            case "x": onToolSelected?(.erase); return
+            case "s": onToolSelected?(.stepCounter); return
+            default: break
+            }
+        }
+
         super.keyDown(with: event)
     }
 
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
-        // Handle CMD+Z for undo
-        if event.modifierFlags.contains(.command) && event.charactersIgnoringModifiers == "z" {
+        // Don't intercept keys when a text field is being edited
+        if textField != nil { return super.performKeyEquivalent(with: event) }
+
+        let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        let chars = event.charactersIgnoringModifiers ?? ""
+
+        // CMD+SHIFT+Z = Redo
+        if flags == [.command, .shift] && chars == "z" {
+            onRedo?()
+            return true
+        }
+
+        // CMD+Z = Undo
+        if flags == .command && chars == "z" {
             onUndo?()
             return true
         }
+
+        // CMD+D = Duplicate
+        if flags == .command && chars == "d" {
+            if selectedAnnotationId != nil {
+                onDuplicate?()
+                return true
+            }
+        }
+
         return super.performKeyEquivalent(with: event)
     }
 
@@ -3012,6 +3234,67 @@ class AnnotationCanvasNSView: NSView, NSTextFieldDelegate {
             context.setLineWidth(1)
             context.stroke(rect)
         }
+    }
+
+    override func rightMouseDown(with event: NSEvent) {
+        let location = convert(event.locationInWindow, from: nil)
+
+        // Find annotation under the click
+        var clickedAnnotation: Annotation?
+        for annotation in annotations.reversed() {
+            if isPointInsideAnnotation(location, annotation: annotation) {
+                clickedAnnotation = annotation
+                break
+            }
+        }
+
+        guard let annotation = clickedAnnotation else {
+            super.rightMouseDown(with: event)
+            return
+        }
+
+        // Select the right-clicked annotation
+        selectedAnnotationId = annotation.id
+        needsDisplay = true
+
+        // Build context menu
+        let menu = NSMenu()
+
+        let deleteItem = NSMenuItem(title: "Delete", action: #selector(contextMenuDelete), keyEquivalent: "")
+        deleteItem.target = self
+        menu.addItem(deleteItem)
+
+        let duplicateItem = NSMenuItem(title: "Duplicate", action: #selector(contextMenuDuplicate), keyEquivalent: "")
+        duplicateItem.target = self
+        menu.addItem(duplicateItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        let frontItem = NSMenuItem(title: "Bring to Front", action: #selector(contextMenuBringToFront), keyEquivalent: "")
+        frontItem.target = self
+        menu.addItem(frontItem)
+
+        let backItem = NSMenuItem(title: "Send to Back", action: #selector(contextMenuSendToBack), keyEquivalent: "")
+        backItem.target = self
+        menu.addItem(backItem)
+
+        NSMenu.popUpContextMenu(menu, with: event, for: self)
+    }
+
+    @objc private func contextMenuDelete() {
+        onDeleteSelected?()
+    }
+
+    @objc private func contextMenuDuplicate() {
+        onDuplicate?()
+    }
+
+    @objc private func contextMenuBringToFront() {
+        onBringToFront?()
+    }
+
+    @objc private func contextMenuSendToBack() {
+        onSendToBack?()
     }
 
     override func mouseDown(with event: NSEvent) {
