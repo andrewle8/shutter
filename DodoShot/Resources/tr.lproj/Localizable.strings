@@ -25,6 +25,7 @@
 "menu.captureError" = "Hata yakala";
 "menu.captureForClaude" = "Claude için yakala";
 "menu.captureCode" = "Kod yakala";
+"menu.smartCapture" = "Akilli yakalama";
 "menu.selectScreen" = "Ekran seç";
 "menu.allScreens" = "Tüm Ekranlar";
 "menu.mainScreen" = "Ana";
@@ -117,6 +118,7 @@
 "settings.captureForClaude" = "Claude için yakala";
 "settings.captureCode" = "Kod bloğu yakala";
 "settings.recaptureLastArea" = "Son alani yeniden yakala";
+"settings.smartCapture" = "Akilli yakalama";
 "settings.recording" = "Kaydediliyor...";
 "settings.permissions" = "Erişilebilirlik izni gerekli";
 "settings.permissions.description" = "Lucida'un global kısayolları çalışması için erişilebilirlik izni gereklidir.";

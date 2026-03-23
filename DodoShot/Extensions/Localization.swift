@@ -38,6 +38,7 @@ enum L10n {
         static let captureError = "menu.captureError".localized
         static let captureForClaude = "menu.captureForClaude".localized
         static let captureCode = "menu.captureCode".localized
+        static let smartCapture = "menu.smartCapture".localized
         static let selectScreen = "menu.selectScreen".localized
         static let allScreens = "menu.allScreens".localized
         static let mainScreen = "menu.mainScreen".localized
@@ -133,6 +134,7 @@ enum L10n {
         static let captureForClaude = "settings.captureForClaude".localized
         static let captureCode = "settings.captureCode".localized
         static let recaptureLastArea = "settings.recaptureLastArea".localized
+        static let smartCapture = "settings.smartCapture".localized
         static let captureWindowShadow = "settings.captureWindowShadow".localized
         static let recording = "settings.recording".localized
         static let permissions = "settings.permissions".localized

@@ -25,6 +25,7 @@
 "menu.captureError" = "Fehler aufnehmen";
 "menu.captureForClaude" = "Aufnahme für Claude";
 "menu.captureCode" = "Code aufnehmen";
+"menu.smartCapture" = "Intelligente Aufnahme";
 "menu.selectScreen" = "Bildschirm auswählen";
 "menu.allScreens" = "Alle Bildschirme";
 "menu.mainScreen" = "Haupt";
@@ -117,6 +118,7 @@
 "settings.captureForClaude" = "Aufnahme für Claude";
 "settings.captureCode" = "Codeblock aufnehmen";
 "settings.recaptureLastArea" = "Letzte Bereichsaufnahme wiederholen";
+"settings.smartCapture" = "Intelligente Aufnahme";
 "settings.recording" = "Aufnahme...";
 "settings.permissions" = "Bedienungshilfen-Berechtigung erforderlich";
 "settings.permissions.description" = "Lucida benötigt Bedienungshilfen-Zugriff für globale Tastenkürzel.";

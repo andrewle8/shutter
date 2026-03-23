@@ -25,6 +25,7 @@
 "menu.captureError" = "Capturar error";
 "menu.captureForClaude" = "Captura para Claude";
 "menu.captureCode" = "Capturar código";
+"menu.smartCapture" = "Captura inteligente";
 "menu.selectScreen" = "Seleccionar pantalla";
 "menu.allScreens" = "Todas las pantallas";
 "menu.mainScreen" = "Principal";
@@ -117,6 +118,7 @@
 "settings.captureForClaude" = "Captura para Claude";
 "settings.captureCode" = "Capturar bloque de código";
 "settings.recaptureLastArea" = "Recapturar ultima area";
+"settings.smartCapture" = "Captura inteligente";
 "settings.recording" = "Grabando...";
 "settings.permissions" = "Permiso de accesibilidad requerido";
 "settings.permissions.description" = "Lucida necesita acceso de accesibilidad para los atajos globales.";

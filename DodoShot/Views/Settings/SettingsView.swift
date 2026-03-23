@@ -724,6 +724,17 @@ struct HotkeysSettingsTab: View {
                             hotkey: $settingsManager.settings.hotkeys.recaptureLastArea,
                             hasConflict: HotkeyManager.shared.conflictingHotkeys.contains(settingsManager.settings.hotkeys.recaptureLastArea)
                         )
+
+                        Divider()
+                            .padding(.vertical, 12)
+
+                        HotkeyRow(
+                            label: L10n.Settings.smartCapture,
+                            icon: "sparkles.rectangle.stack",
+                            iconColor: Color(red: 0x2E / 255.0, green: 0xD0 / 255.0, blue: 0x65 / 255.0),
+                            hotkey: $settingsManager.settings.hotkeys.smartCapture,
+                            hasConflict: HotkeyManager.shared.conflictingHotkeys.contains(settingsManager.settings.hotkeys.smartCapture)
+                        )
                     }
                 }
 

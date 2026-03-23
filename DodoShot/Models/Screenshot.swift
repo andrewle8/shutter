@@ -721,13 +721,14 @@ struct HotkeySettings: Codable {
     var captureForClaude: String
     var captureCode: String
     var recaptureLastArea: String
+    var smartCapture: String
 
     enum CodingKeys: String, CodingKey {
         case areaCapture, windowCapture, fullscreenCapture, autoPasteCapture, ocrPasteCapture, allScreensCapture
         case scrollingCapture, ocrCapture, colorPicker, pixelRuler, timedCapture, activeWindowCapture
         case unifiedCapture
         case captureError, captureForClaude, captureCode
-        case recaptureLastArea
+        case recaptureLastArea, smartCapture
     }
 
     init(
@@ -747,7 +748,8 @@ struct HotkeySettings: Codable {
         captureError: String = "⌘⇧E",
         captureForClaude: String = "⌘⇧F",
         captureCode: String = "⌘⇧`",
-        recaptureLastArea: String = "⌘⇧L"
+        recaptureLastArea: String = "⌘⇧L",
+        smartCapture: String = "⌘⇧Space"
     ) {
         self.areaCapture = areaCapture
         self.windowCapture = windowCapture
@@ -766,6 +768,7 @@ struct HotkeySettings: Codable {
         self.captureForClaude = captureForClaude
         self.captureCode = captureCode
         self.recaptureLastArea = recaptureLastArea
+        self.smartCapture = smartCapture
     }
 
     init(from decoder: Decoder) throws {
@@ -787,6 +790,7 @@ struct HotkeySettings: Codable {
         captureForClaude = try container.decodeIfPresent(String.self, forKey: .captureForClaude) ?? "⌘⇧F"
         captureCode = try container.decodeIfPresent(String.self, forKey: .captureCode) ?? "⌘⇧`"
         recaptureLastArea = try container.decodeIfPresent(String.self, forKey: .recaptureLastArea) ?? "⌘⇧L"
+        smartCapture = try container.decodeIfPresent(String.self, forKey: .smartCapture) ?? "⌘⇧Space"
     }
 
     static var `default`: HotkeySettings {
@@ -807,7 +811,8 @@ struct HotkeySettings: Codable {
             captureError: "⌘⇧E",
             captureForClaude: "⌘⇧F",
             captureCode: "⌘⇧`",
-            recaptureLastArea: "⌘⇧L"
+            recaptureLastArea: "⌘⇧L",
+            smartCapture: "⌘⇧Space"
         )
     }
 }

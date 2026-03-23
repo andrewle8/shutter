@@ -25,6 +25,7 @@
 "menu.captureError" = "Capture Error";
 "menu.captureForClaude" = "Capture for Claude";
 "menu.captureCode" = "Capture Code";
+"menu.smartCapture" = "Smart Capture";
 "menu.selectScreen" = "Select screen";
 "menu.allScreens" = "All Screens";
 "menu.mainScreen" = "Main";
@@ -117,6 +118,7 @@
 "settings.captureForClaude" = "Capture for Claude";
 "settings.captureCode" = "Capture code block";
 "settings.recaptureLastArea" = "Re-capture last area";
+"settings.smartCapture" = "Smart capture";
 "settings.recording" = "Recording...";
 "settings.permissions" = "Accessibility permission required";
 "settings.permissions.description" = "Lucida needs accessibility access for global hotkeys to work.";

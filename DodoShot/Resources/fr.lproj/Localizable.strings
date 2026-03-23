@@ -25,6 +25,7 @@
 "menu.captureError" = "Capturer une erreur";
 "menu.captureForClaude" = "Capture pour Claude";
 "menu.captureCode" = "Capturer du code";
+"menu.smartCapture" = "Capture intelligente";
 "menu.selectScreen" = "Choisir un écran";
 "menu.allScreens" = "Tous les écrans";
 "menu.mainScreen" = "Principal";
@@ -117,6 +118,7 @@
 "settings.captureForClaude" = "Capture pour Claude";
 "settings.captureCode" = "Capturer un bloc de code";
 "settings.recaptureLastArea" = "Recapturer la dernière zone";
+"settings.smartCapture" = "Capture intelligente";
 "settings.recording" = "Enregistrement...";
 "settings.permissions" = "Autorisation d'accessibilité requise";
 "settings.permissions.description" = "Lucida nécessite l'accès à l'accessibilité pour les raccourcis globaux.";
