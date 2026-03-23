@@ -40,6 +40,8 @@
 		WH2A3B4C5D6E7F8A9B0C1D2E /* WelcomeHUDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WH1A2B3C4D5E6F7A8B9C0D1E /* WelcomeHUDView.swift */; };
 		HS2A3B4C5D6E7F8A9B0C1D2E /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = HS1A2B3C4D5E6F7A8B9C0D1E /* HistoryStore.swift */; };
 		OPP2A3B4C5D6E7F8A9B0C1D2 /* OCRPostProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = OPP1A2B3C4D5E6F7A8B9C0D1 /* OCRPostProcessor.swift */; };
+		SC2A3B4C5D6E7F8A9B0C1D2E /* SmartCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC1A2B3C4D5E6F7A8B9C0D1E /* SmartCaptureService.swift */; };
+		SP2A3B4C5D6E7F8A9B0C1D2E /* SmartCapturePromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP1A2B3C4D5E6F7A8B9C0D1E /* SmartCapturePromptView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -79,6 +81,8 @@
 		WH1A2B3C4D5E6F7A8B9C0D1E /* WelcomeHUDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeHUDView.swift; sourceTree = "<group>"; };
 		HS1A2B3C4D5E6F7A8B9C0D1E /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
 		OPP1A2B3C4D5E6F7A8B9C0D1 /* OCRPostProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRPostProcessor.swift; sourceTree = "<group>"; };
+		SC1A2B3C4D5E6F7A8B9C0D1E /* SmartCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartCaptureService.swift; sourceTree = "<group>"; };
+		SP1A2B3C4D5E6F7A8B9C0D1E /* SmartCapturePromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartCapturePromptView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +167,7 @@
 				LAB000001 /* LaunchAtLoginManager.swift */,
 				HS1A2B3C4D5E6F7A8B9C0D1E /* HistoryStore.swift */,
 				OPP1A2B3C4D5E6F7A8B9C0D1 /* OCRPostProcessor.swift */,
+				SC1A2B3C4D5E6F7A8B9C0D1E /* SmartCaptureService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -193,6 +198,7 @@
 			isa = PBXGroup;
 			children = (
 				WH1A2B3C4D5E6F7A8B9C0D1E /* WelcomeHUDView.swift */,
+				SP1A2B3C4D5E6F7A8B9C0D1E /* SmartCapturePromptView.swift */,
 			);
 			path = Overlay;
 			sourceTree = "<group>";
@@ -343,6 +349,8 @@
 				WH2A3B4C5D6E7F8A9B0C1D2E /* WelcomeHUDView.swift in Sources */,
 				HS2A3B4C5D6E7F8A9B0C1D2E /* HistoryStore.swift in Sources */,
 				OPP2A3B4C5D6E7F8A9B0C1D2 /* OCRPostProcessor.swift in Sources */,
+				SC2A3B4C5D6E7F8A9B0C1D2E /* SmartCaptureService.swift in Sources */,
+				SP2A3B4C5D6E7F8A9B0C1D2E /* SmartCapturePromptView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -198,6 +198,13 @@ class HotkeyManager {
             }))
         }
 
+        // Smart capture (capture + OCR + prompt + paste)
+        if let parsed = HotkeyManager.parseHotkeyString(settings.smartCapture) {
+            allDefs.append(HotkeyDef(displayString: settings.smartCapture, keyCode: parsed.keyCode, modifiers: parsed.modifiers, action: {
+                DispatchQueue.main.async { SmartCaptureService.shared.startSmartCapture() }
+            }))
+        }
+
         // Detect conflicts: group by (keyCode, modifiers) and only register the first binding per group
         var seen: [String: String] = [:]  // "keyCode:modifiers" -> first display string
         for def in allDefs {
