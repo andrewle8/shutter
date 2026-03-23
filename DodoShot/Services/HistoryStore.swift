@@ -47,7 +47,31 @@ class HistoryStore: ObservableObject {
             filename: filename
         )
         entries.insert(entry, at: 0)
+        trimAndSaveIndex()
+    }
 
+    /// Save from a background thread — writes PNG to disk without blocking main thread
+    nonisolated func saveInBackground(screenshot: Screenshot) {
+        let filename = "\(screenshot.id.uuidString).png"
+        let fileURL = historyDir.appendingPathComponent(filename)
+        try? screenshot.pngData.write(to: fileURL)
+
+        let entry = HistoryEntry(
+            id: screenshot.id,
+            capturedAt: screenshot.capturedAt,
+            captureType: screenshot.captureType.rawValue,
+            width: Int(screenshot.imageSize.width),
+            height: Int(screenshot.imageSize.height),
+            filename: filename
+        )
+
+        DispatchQueue.main.async { [weak self] in
+            self?.entries.insert(entry, at: 0)
+            self?.trimAndSaveIndex()
+        }
+    }
+
+    private func trimAndSaveIndex() {
         let max = SettingsManager.shared.settings.maxHistoryItems
         if entries.count > max {
             let removed = entries.suffix(from: max)
@@ -56,7 +80,6 @@ class HistoryStore: ObservableObject {
             }
             entries = Array(entries.prefix(max))
         }
-
         saveIndex()
     }
 

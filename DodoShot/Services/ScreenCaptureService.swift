@@ -1095,8 +1095,11 @@ class ScreenCaptureService: ObservableObject {
                 recentCaptures = Array(recentCaptures.prefix(10))
             }
 
-            // Persist to disk
-            HistoryStore.shared.save(screenshot: screenshot)
+            // Persist to disk in background — don't block the UI
+            let screenshotCopy = screenshot
+            DispatchQueue.global(qos: .utility).async {
+                HistoryStore.shared.saveInBackground(screenshot: screenshotCopy)
+            }
         }
 
         // Auto-paste mode: copy to clipboard, paste into previous app, skip editor
