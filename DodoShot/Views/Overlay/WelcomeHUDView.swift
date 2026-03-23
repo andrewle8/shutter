@@ -28,10 +28,10 @@ class WelcomeHUDWindowController {
         }
 
         let hostingView = NSHostingView(rootView: hudView)
-        hostingView.frame = NSRect(x: 0, y: 0, width: 420, height: 200)
+        hostingView.frame = NSRect(x: 0, y: 0, width: 520, height: 200)
 
         let window = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 420, height: 200),
+            contentRect: NSRect(x: 0, y: 0, width: 520, height: 200),
             styleMask: [.nonactivatingPanel, .hudWindow, .borderless],
             backing: .buffered,
             defer: false
@@ -47,7 +47,7 @@ class WelcomeHUDWindowController {
         // Center horizontally, position in lower third of screen
         if let screen = NSScreen.main {
             let screenFrame = screen.visibleFrame
-            let x = screenFrame.midX - 210
+            let x = screenFrame.midX - 260
             let y = screenFrame.minY + screenFrame.height * 0.25
             window.setFrameOrigin(NSPoint(x: x, y: y))
         }
@@ -105,7 +105,7 @@ struct WelcomeHUDView: View {
                     .font(.system(size: 22, weight: .semibold))
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [.purple, .blue],
+                            colors: [.green, .mint],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -137,27 +137,35 @@ struct WelcomeHUDView: View {
             .padding(.bottom, 14)
 
             // Shortcut cards
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 ShortcutCard(
                     shortcut: "\u{2318}\u{21E7}4",
                     label: "Area",
                     icon: "rectangle.dashed",
-                    color: .purple,
+                    color: .green,
                     isPrimary: true
                 )
 
                 ShortcutCard(
-                    shortcut: "\u{2318}\u{21E7}5",
-                    label: "Window",
-                    icon: "macwindow",
-                    color: .blue,
+                    shortcut: "\u{2318}\u{21E7}6",
+                    label: "Auto-paste",
+                    icon: "doc.on.clipboard",
+                    color: .green,
                     isPrimary: false
                 )
 
                 ShortcutCard(
-                    shortcut: "\u{2318}\u{21E7}3",
-                    label: "Fullscreen",
-                    icon: "rectangle.inset.filled",
+                    shortcut: "\u{2318}\u{21E7}7",
+                    label: "OCR Paste",
+                    icon: "text.viewfinder",
+                    color: .green,
+                    isPrimary: false
+                )
+
+                ShortcutCard(
+                    shortcut: "\u{2318}\u{21E7}F",
+                    label: "For Claude",
+                    icon: "sparkles",
                     color: .green,
                     isPrimary: false
                 )
@@ -165,7 +173,7 @@ struct WelcomeHUDView: View {
             .padding(.horizontal, 20)
             .padding(.bottom, 18)
         }
-        .frame(width: 420)
+        .frame(width: 520)
         .background(
             ZStack {
                 VisualEffectBlur(material: .hudWindow, blendingMode: .behindWindow)

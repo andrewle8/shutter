@@ -120,18 +120,28 @@ class ScreenCaptureService: ObservableObject {
     }
 
     func startScrollingCapture() {
+        previousApp = NSWorkspace.shared.frontmostApplication
         isCapturing = true
 
-        // Get windows using CGWindowList API (no permission dialog)
-        let windows = WindowInfo.getVisibleWindows()
+        // Show area selection, then hand the selected rect to ScrollingCaptureService
+        closeCaptureWindows()
 
-        if windows.isEmpty {
-            print("No windows found for scrolling capture")
-            isCapturing = false
-            return
+        let screens = NSScreen.screens
+        for screen in screens {
+            let window = createCaptureOverlayWindow(for: screen)
+            let contentView = AreaSelectionView(
+                onComplete: { [weak self] rect in
+                    self?.beginScrollingCaptureForArea(rect: rect, screen: screen)
+                },
+                onCancel: { [weak self] in
+                    self?.cancelCapture()
+                }
+            )
+
+            window.contentView = NSHostingView(rootView: contentView)
+            window.makeKeyAndOrderFront(nil)
+            captureWindows.append(window)
         }
-
-        showWindowPickerForScrolling(windows: windows)
     }
 
     /// Show the timed capture modal for selecting delay
@@ -543,36 +553,25 @@ class ScreenCaptureService: ObservableObject {
 
     // MARK: - Scrolling Capture
 
-    private func showWindowPickerForScrolling(windows: [WindowInfo]) {
-        guard let screen = NSScreen.main else { return }
+    private func beginScrollingCaptureForArea(rect: CGRect, screen: NSScreen) {
+        // Hide capture overlay windows before starting the scroll loop
+        for window in captureWindows {
+            window.orderOut(nil)
+        }
 
-        let window = createCaptureOverlayWindow(for: screen)
-        let contentView = WindowSelectionView(
-            windows: windows,
-            onSelect: { [weak self] selectedWindow in
-                self?.startScrollingCaptureForWindow(selectedWindow)
-            },
-            onCancel: { [weak self] in
-                self?.cancelCapture()
-            },
-            title: "Select window for scrolling capture"
-        )
+        // Short delay so overlays are fully hidden
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            guard let self = self else { return }
+            self.closeCaptureWindows()
 
-        window.contentView = NSHostingView(rootView: contentView)
-        window.makeKeyAndOrderFront(nil)
-        captureWindows.append(window)
-    }
-
-    private func startScrollingCaptureForWindow(_ windowInfo: WindowInfo) {
-        closeCaptureWindows()
-
-        ScrollingCaptureService.shared.startScrollingCapture(for: windowInfo) { [weak self] image in
-            guard let self = self, let image = image else {
-                self?.isCapturing = false
-                return
+            ScrollingCaptureService.shared.startAreaScrollingCapture(rect: rect, screen: screen) { [weak self] image in
+                guard let self = self else { return }
+                if let image = image {
+                    self.completeCapture(image: image, type: .area)
+                } else {
+                    self.isCapturing = false
+                }
             }
-
-            self.completeCapture(image: image, type: .fullscreen) // Using fullscreen type for scrolling
         }
     }
 

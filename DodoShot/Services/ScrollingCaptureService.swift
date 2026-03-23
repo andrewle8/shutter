@@ -2,7 +2,9 @@ import Foundation
 import AppKit
 import CoreGraphics
 
-/// Service for capturing scrolling content by stitching multiple screenshots
+/// Service for area-based scrolling capture.
+/// The user selects a screen region, then the service auto-scrolls and captures
+/// that same region repeatedly, stitching overlapping frames together.
 class ScrollingCaptureService: ObservableObject {
     static let shared = ScrollingCaptureService()
 
@@ -10,212 +12,256 @@ class ScrollingCaptureService: ObservableObject {
     @Published var capturedFrames: [NSImage] = []
     @Published var progress: CGFloat = 0
 
-    private var scrollWindow: NSWindow?
-    private var targetWindow: WindowInfo?
-    private var captureTimer: Timer?
-    private var lastScrollPosition: CGFloat = 0
-    private var scrollDirection: ScrollDirection = .down
+    private var captureRect: CGRect = .zero   // Global display coordinates
+    private var captureScreen: NSScreen?
     private var onComplete: ((NSImage?) -> Void)?
-
-    enum ScrollDirection {
-        case down
-        case up
-    }
+    private let maxFrames = 20
 
     private init() {}
 
     // MARK: - Public Methods
 
-    /// Start scrolling capture for a specific window
-    func startScrollingCapture(for window: WindowInfo, direction: ScrollDirection = .down, completion: @escaping (NSImage?) -> Void) {
+    /// Start area-based scrolling capture.
+    /// `rect` is the user-selected area in the capture window's coordinate space
+    /// (top-left origin, same as AreaSelectionView provides).
+    /// `screen` is the screen the selection was made on.
+    func startAreaScrollingCapture(rect: CGRect, screen: NSScreen, completion: @escaping (NSImage?) -> Void) {
         guard !isCapturing else { return }
 
         self.isCapturing = true
         self.capturedFrames = []
         self.progress = 0
-        self.targetWindow = window
-        self.scrollDirection = direction
         self.onComplete = completion
+        self.captureScreen = screen
 
-        // Show the scrolling capture overlay
-        showScrollingOverlay(for: window)
+        // Convert selection rect to global display coordinates
+        // (same conversion as ScreenCaptureService.captureArea)
+        let roundedRect = CGRect(
+            x: round(rect.origin.x),
+            y: round(rect.origin.y),
+            width: round(rect.width),
+            height: round(rect.height)
+        )
+        self.captureRect = CGRect(
+            x: roundedRect.origin.x + screen.frame.origin.x,
+            y: roundedRect.origin.y + screen.frame.origin.y,
+            width: roundedRect.width,
+            height: roundedRect.height
+        )
+
+        NSLog("[ScrollingCapture] Starting area scrolling capture, rect: %@", NSStringFromRect(captureRect))
+
+        // Begin the auto-scroll capture loop
+        runCaptureLoop()
     }
 
-    /// Manual capture mode - user controls scrolling
-    func captureCurrentFrame() {
-        guard let window = targetWindow else { return }
+    /// Cancel the capture
+    func cancelCapture() {
+        isCapturing = false
+        capturedFrames = []
+        progress = 0
+        onComplete?(nil)
+        onComplete = nil
+    }
 
-        if let image = captureWindowFrame(window) {
-            self.capturedFrames.append(image)
-            self.progress = min(1.0, CGFloat(self.capturedFrames.count) / 10.0)
+    // MARK: - Capture Loop
+
+    private func runCaptureLoop() {
+        // Capture the first frame
+        guard let firstFrame = captureCurrentRect() else {
+            NSLog("[ScrollingCapture] Failed to capture first frame")
+            finishWithResult()
+            return
+        }
+        capturedFrames.append(firstFrame)
+        progress = CGFloat(capturedFrames.count) / CGFloat(maxFrames)
+
+        // Start the scroll-capture cycle
+        scrollAndCaptureNext()
+    }
+
+    private func scrollAndCaptureNext() {
+        guard isCapturing else { return }
+        guard capturedFrames.count < maxFrames else {
+            NSLog("[ScrollingCapture] Reached max frames (%d), finishing", maxFrames)
+            finishWithResult()
+            return
+        }
+
+        // Scroll down by ~80% of the selected area height to ensure overlap
+        let scrollAmount = Int(captureRect.height * 0.8)
+        postScrollEvent(deltaY: -scrollAmount)
+
+        // Wait for rendering after scroll
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+            guard let self = self, self.isCapturing else { return }
+
+            guard let newFrame = self.captureCurrentRect() else {
+                NSLog("[ScrollingCapture] Failed to capture frame %d, finishing", self.capturedFrames.count + 1)
+                self.finishWithResult()
+                return
+            }
+
+            // Check if content has changed by comparing with the previous frame
+            if self.framesAreIdentical(self.capturedFrames.last!, newFrame) {
+                NSLog("[ScrollingCapture] No new content detected after %d frames, finishing", self.capturedFrames.count)
+                self.finishWithResult()
+                return
+            }
+
+            self.capturedFrames.append(newFrame)
+            self.progress = CGFloat(self.capturedFrames.count) / CGFloat(self.maxFrames)
+            NSLog("[ScrollingCapture] Captured frame %d", self.capturedFrames.count)
+
+            // Continue scrolling
+            self.scrollAndCaptureNext()
         }
     }
 
-    /// Finish capture and stitch images
-    func finishCapture() {
-        isCapturing = false
-        scrollWindow?.close()
-        scrollWindow = nil
-        captureTimer?.invalidate()
-        captureTimer = nil
+    // MARK: - Capture & Scroll Helpers
 
-        // Stitch captured frames
-        if capturedFrames.count > 0 {
-            let stitchedImage = stitchImages(capturedFrames, direction: scrollDirection)
-            onComplete?(stitchedImage)
+    private func captureCurrentRect() -> NSImage? {
+        guard let cgImage = CGWindowListCreateImage(
+            captureRect,
+            .optionOnScreenBelowWindow,
+            kCGNullWindowID,
+            [.bestResolution]
+        ) else {
+            return nil
+        }
+
+        // Use point size (not pixel size) for correct Retina handling
+        return NSImage(cgImage: cgImage, size: NSSize(
+            width: captureRect.width,
+            height: captureRect.height
+        ))
+    }
+
+    private func postScrollEvent(deltaY: Int) {
+        // CGEvent scroll uses pixel units; negative = scroll down
+        let scrollEvent = CGEvent(
+            scrollWheelEvent2Source: nil,
+            units: .pixel,
+            wheelCount: 1,
+            wheel1: Int32(deltaY),
+            wheel2: 0,
+            wheel3: 0
+        )
+        // Position the scroll event at the center of the capture area
+        let centerPoint = CGPoint(
+            x: captureRect.midX,
+            y: captureRect.midY
+        )
+        scrollEvent?.location = centerPoint
+        scrollEvent?.post(tap: .cgSessionEventTap)
+    }
+
+    /// Quick check: are two frames essentially the same? (content stopped scrolling)
+    private func framesAreIdentical(_ a: NSImage, _ b: NSImage) -> Bool {
+        guard let aCG = a.cgImage(forProposedRect: nil, context: nil, hints: nil),
+              let bCG = b.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            return false
+        }
+
+        guard let aData = aCG.dataProvider?.data,
+              let bData = bCG.dataProvider?.data else {
+            return false
+        }
+
+        let aPtr = CFDataGetBytePtr(aData)
+        let bPtr = CFDataGetBytePtr(bData)
+        let bytesPerRow = aCG.bytesPerRow
+        let width = min(aCG.width, bCG.width)
+        let height = min(aCG.height, bCG.height)
+
+        // Sample several rows across the image
+        let rowsToCheck = min(20, height)
+        let rowStep = max(1, height / rowsToCheck)
+        var totalDifferences = 0
+
+        for rowIdx in stride(from: 0, to: height, by: rowStep) {
+            let offset = rowIdx * bytesPerRow
+            let sampleInterval = max(1, width / 50) // Sample 50 pixels per row
+
+            for x in stride(from: 0, to: width * 4, by: sampleInterval * 4) {
+                for channel in 0..<3 {
+                    guard let aPtr = aPtr, let bPtr = bPtr else { return false }
+                    let aVal = Int(aPtr[offset + x + channel])
+                    let bVal = Int(bPtr[offset + x + channel])
+                    if abs(aVal - bVal) > 10 {
+                        totalDifferences += 1
+                    }
+                }
+            }
+        }
+
+        // If very few differences, frames are effectively the same
+        return totalDifferences < 15
+    }
+
+    // MARK: - Finish & Stitch
+
+    private func finishWithResult() {
+        isCapturing = false
+
+        if capturedFrames.count > 1 {
+            let stitched = stitchImages(capturedFrames)
+            onComplete?(stitched)
+        } else if capturedFrames.count == 1 {
+            onComplete?(capturedFrames.first)
         } else {
             onComplete?(nil)
         }
 
         capturedFrames = []
         progress = 0
-        targetWindow = nil
+        onComplete = nil
     }
 
-    /// Cancel the capture
-    func cancelCapture() {
-        isCapturing = false
-        scrollWindow?.close()
-        scrollWindow = nil
-        captureTimer?.invalidate()
-        captureTimer = nil
-        capturedFrames = []
-        progress = 0
-        targetWindow = nil
-        onComplete?(nil)
-    }
+    // MARK: - Image Stitching
 
-    // MARK: - Private Methods
-
-    private func showScrollingOverlay(for window: WindowInfo) {
-        let windowFrame = window.frame
-
-        // Get screen for proper coordinate conversion
-        guard let screen = NSScreen.screens.first(where: { screen in
-            screen.frame.intersects(windowFrame)
-        }) ?? NSScreen.main else {
-            cancelCapture()
-            return
-        }
-
-        // Convert to screen coordinates (flip Y)
-        let screenHeight = screen.frame.height
-        let flippedY = screenHeight - windowFrame.origin.y - windowFrame.height
-        let overlayFrame = CGRect(
-            x: windowFrame.origin.x,
-            y: flippedY,
-            width: windowFrame.width,
-            height: windowFrame.height
-        )
-
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-
-            let overlayWindow = ScrollingCaptureWindow(
-                contentRect: overlayFrame,
-                styleMask: [.borderless],
-                backing: .buffered,
-                defer: false
-            )
-
-            overlayWindow.level = .floating
-            overlayWindow.backgroundColor = .clear
-            overlayWindow.isOpaque = false
-            overlayWindow.hasShadow = false
-            overlayWindow.ignoresMouseEvents = false
-            overlayWindow.isReleasedWhenClosed = false
-            overlayWindow.onEscape = { [weak self] in
-                self?.cancelCapture()
-            }
-            overlayWindow.onEnter = { [weak self] in
-                self?.finishCapture()
-            }
-
-            let overlayView = ScrollingCaptureOverlayView(
-                service: self,
-                windowTitle: window.title ?? window.ownerName ?? "Window"
-            )
-            overlayWindow.contentView = NSHostingView(rootView: overlayView)
-            overlayWindow.makeKeyAndOrderFront(nil)
-
-            self.scrollWindow = overlayWindow
-
-            // Capture first frame immediately
-            self.captureCurrentFrame()
-        }
-    }
-
-    private func captureWindowFrame(_ window: WindowInfo) -> NSImage? {
-        guard let cgImage = CGWindowListCreateImage(
-            window.frame,
-            .optionIncludingWindow,
-            window.windowID,
-            [.bestResolution, .boundsIgnoreFraming]
-        ) else {
-            print("Failed to capture window frame")
-            return nil
-        }
-
-        return NSImage(cgImage: cgImage, size: NSSize(
-            width: window.frame.width,
-            height: window.frame.height
-        ))
-    }
-
-    /// Stitch multiple images together vertically
-    private func stitchImages(_ images: [NSImage], direction: ScrollDirection) -> NSImage? {
+    /// Stitch multiple images together vertically (scrolling down)
+    private func stitchImages(_ images: [NSImage]) -> NSImage? {
         guard !images.isEmpty else { return nil }
         guard images.count > 1 else { return images.first }
 
-        // Find overlapping regions and stitch
-        var stitchedImages: [NSImage] = [images[0]]
+        var result = images[0]
 
         for i in 1..<images.count {
-            let previousImage = stitchedImages.last!
             let currentImage = images[i]
 
-            // Find overlap between consecutive images
-            if let stitched = stitchTwoImages(previousImage, currentImage, direction: direction) {
-                stitchedImages[stitchedImages.count - 1] = stitched
+            if let stitched = stitchTwoImages(result, currentImage) {
+                result = stitched
             } else {
-                // If no overlap found, just append vertically
-                if let combined = combineVertically(stitchedImages.last!, currentImage, direction: direction) {
-                    stitchedImages[stitchedImages.count - 1] = combined
+                // No overlap found, append vertically
+                if let combined = combineVertically(result, currentImage) {
+                    result = combined
                 }
             }
         }
 
-        return stitchedImages.last
+        return result
     }
 
-    /// Stitch two images by finding overlapping region
-    private func stitchTwoImages(_ top: NSImage, _ bottom: NSImage, direction: ScrollDirection) -> NSImage? {
+    /// Stitch two images by finding and removing the overlapping region
+    private func stitchTwoImages(_ top: NSImage, _ bottom: NSImage) -> NSImage? {
         guard let topCG = top.cgImage(forProposedRect: nil, context: nil, hints: nil),
               let bottomCG = bottom.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             return nil
         }
 
-        // Find overlap using image comparison
         let overlapHeight = findOverlap(topImage: topCG, bottomImage: bottomCG)
 
         if overlapHeight > 0 {
-            // Create combined image
             let totalHeight = top.size.height + bottom.size.height - CGFloat(overlapHeight)
             let width = max(top.size.width, bottom.size.width)
 
             let newImage = NSImage(size: NSSize(width: width, height: totalHeight))
             newImage.lockFocus()
 
-            if direction == .down {
-                // Draw top image at top
-                top.draw(in: NSRect(x: 0, y: totalHeight - top.size.height, width: top.size.width, height: top.size.height))
-                // Draw bottom image below, accounting for overlap
-                bottom.draw(in: NSRect(x: 0, y: 0, width: bottom.size.width, height: bottom.size.height))
-            } else {
-                // For upward scrolling, reverse order
-                bottom.draw(in: NSRect(x: 0, y: totalHeight - bottom.size.height, width: bottom.size.width, height: bottom.size.height))
-                top.draw(in: NSRect(x: 0, y: 0, width: top.size.width, height: top.size.height))
-            }
+            // Draw top image at top, bottom image below (minus overlap)
+            top.draw(in: NSRect(x: 0, y: totalHeight - top.size.height, width: top.size.width, height: top.size.height))
+            bottom.draw(in: NSRect(x: 0, y: 0, width: bottom.size.width, height: bottom.size.height))
 
             newImage.unlockFocus()
             return newImage
@@ -224,10 +270,10 @@ class ScrollingCaptureService: ObservableObject {
         return nil
     }
 
-    /// Find vertical overlap between two images
+    /// Find vertical overlap between two consecutive frames
     private func findOverlap(topImage: CGImage, bottomImage: CGImage) -> Int {
         let maxOverlap = min(topImage.height, bottomImage.height) / 2
-        let stripHeight = 20 // Compare 20-pixel strips
+        let stripHeight = 20
 
         guard let topData = topImage.dataProvider?.data,
               let bottomData = bottomImage.dataProvider?.data else {
@@ -240,7 +286,6 @@ class ScrollingCaptureService: ObservableObject {
         let bytesPerRow = topImage.bytesPerRow
         let width = min(topImage.width, bottomImage.width)
 
-        // Search for matching rows
         for overlap in stride(from: stripHeight, to: maxOverlap, by: stripHeight) {
             var matches = 0
             let samplesNeeded = 5
@@ -262,7 +307,7 @@ class ScrollingCaptureService: ObservableObject {
         return 0
     }
 
-    /// Compare two rows of pixels
+    /// Compare two rows of pixels with tolerance
     private func compareRows(_ topPtr: UnsafePointer<UInt8>?, _ bottomPtr: UnsafePointer<UInt8>?, topRow: Int, bottomRow: Int, bytesPerRow: Int, width: Int) -> Bool {
         guard let topPtr = topPtr, let bottomPtr = bottomPtr else { return false }
 
@@ -270,11 +315,11 @@ class ScrollingCaptureService: ObservableObject {
         let bottomOffset = bottomRow * bytesPerRow
 
         var differences = 0
-        let tolerance = 10 // Allow some color difference
-        let sampleInterval = max(1, width / 100) // Sample 100 pixels across width
+        let tolerance = 10
+        let sampleInterval = max(1, width / 100)
 
         for x in stride(from: 0, to: width * 4, by: sampleInterval * 4) {
-            for channel in 0..<3 { // RGB
+            for channel in 0..<3 {
                 let topValue = Int(topPtr[topOffset + x + channel])
                 let bottomValue = Int(bottomPtr[bottomOffset + x + channel])
                 if abs(topValue - bottomValue) > tolerance {
@@ -287,154 +332,17 @@ class ScrollingCaptureService: ObservableObject {
     }
 
     /// Combine two images vertically without overlap detection
-    private func combineVertically(_ top: NSImage, _ bottom: NSImage, direction: ScrollDirection) -> NSImage? {
+    private func combineVertically(_ top: NSImage, _ bottom: NSImage) -> NSImage? {
         let totalHeight = top.size.height + bottom.size.height
         let width = max(top.size.width, bottom.size.width)
 
         let newImage = NSImage(size: NSSize(width: width, height: totalHeight))
         newImage.lockFocus()
 
-        if direction == .down {
-            top.draw(in: NSRect(x: 0, y: bottom.size.height, width: top.size.width, height: top.size.height))
-            bottom.draw(in: NSRect(x: 0, y: 0, width: bottom.size.width, height: bottom.size.height))
-        } else {
-            bottom.draw(in: NSRect(x: 0, y: top.size.height, width: bottom.size.width, height: bottom.size.height))
-            top.draw(in: NSRect(x: 0, y: 0, width: top.size.width, height: top.size.height))
-        }
+        top.draw(in: NSRect(x: 0, y: bottom.size.height, width: top.size.width, height: top.size.height))
+        bottom.draw(in: NSRect(x: 0, y: 0, width: bottom.size.width, height: bottom.size.height))
 
         newImage.unlockFocus()
         return newImage
-    }
-}
-
-// MARK: - SwiftUI Overlay View
-import SwiftUI
-
-struct ScrollingCaptureOverlayView: View {
-    @ObservedObject var service: ScrollingCaptureService
-    let windowTitle: String
-
-    var body: some View {
-        ZStack {
-            // Semi-transparent background
-            Color.black.opacity(0.3)
-
-            VStack(spacing: 16) {
-                // Header
-                HStack {
-                    Image(systemName: "scroll")
-                        .font(.system(size: 24))
-                    Text("Scrolling capture")
-                        .font(.headline)
-                }
-                .foregroundColor(.white)
-
-                Text("Scroll in the window behind, then click capture for each section")
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.8))
-                    .multilineTextAlignment(.center)
-
-                // Progress indicator
-                VStack(spacing: 8) {
-                    Text("\(service.capturedFrames.count) frames captured")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.white)
-
-                    ProgressView(value: service.progress)
-                        .progressViewStyle(LinearProgressViewStyle(tint: .orange))
-                        .frame(width: 200)
-                }
-
-                // Action buttons
-                HStack(spacing: 12) {
-                    Button(action: { service.captureCurrentFrame() }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "camera.fill")
-                            Text("Capture")
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(Color.orange)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                    }
-                    .buttonStyle(.plain)
-
-                    Button(action: { service.finishCapture() }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "checkmark")
-                            Text("Done")
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(service.capturedFrames.isEmpty)
-
-                    Button(action: { service.cancelCapture() }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "xmark")
-                            Text("Cancel")
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(Color.red.opacity(0.8))
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                    }
-                    .buttonStyle(.plain)
-                }
-
-                // Instructions
-                Text("Press ESC to cancel • Press Enter when done")
-                    .font(.caption2)
-                    .foregroundColor(.white.opacity(0.6))
-            }
-            .padding(24)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.black.opacity(0.7))
-                    .shadow(radius: 10)
-            )
-        }
-    }
-}
-
-// MARK: - Scrolling Capture Window (handles ESC key properly)
-class ScrollingCaptureWindow: NSWindow {
-    var onEscape: (() -> Void)?
-    var onEnter: (() -> Void)?
-
-    override var canBecomeKey: Bool { true }
-    override var canBecomeMain: Bool { true }
-
-    override func keyDown(with event: NSEvent) {
-        if event.keyCode == 53 { // ESC key
-            onEscape?()
-        } else if event.keyCode == 36 { // Enter key
-            onEnter?()
-        } else {
-            super.keyDown(with: event)
-        }
-    }
-
-    override func cancelOperation(_ sender: Any?) {
-        // Handle ESC/Cmd+. - don't propagate to prevent app termination
-        onEscape?()
-    }
-
-    override func performKeyEquivalent(with event: NSEvent) -> Bool {
-        if event.keyCode == 53 { // ESC key
-            onEscape?()
-            return true
-        }
-        if event.keyCode == 36 { // Enter key
-            onEnter?()
-            return true
-        }
-        return super.performKeyEquivalent(with: event)
     }
 }

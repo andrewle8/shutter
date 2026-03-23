@@ -353,9 +353,9 @@ class PermissionOnboardingWindowController {
             completion()
         }
 
-        let window = NSWindow(
+        let window = NSPanel(
             contentRect: NSRect(x: 0, y: 0, width: 480, height: 540),
-            styleMask: [.titled, .closable],
+            styleMask: [.titled, .closable, .utilityWindow],
             backing: .buffered,
             defer: false
         )
@@ -363,6 +363,7 @@ class PermissionOnboardingWindowController {
         window.title = "Shutter Setup"
         window.titlebarAppearsTransparent = false
         window.titleVisibility = .visible
+        window.hidesOnDeactivate = false
 
         // Position window lower on screen so it doesn't cover the OS permission modal
         if let screen = NSScreen.main {

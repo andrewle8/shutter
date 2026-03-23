@@ -35,6 +35,9 @@ enum L10n {
         static let history = "menu.history".localized
         static let paste = "menu.paste".localized
         static let ocrPaste = "menu.ocrPaste".localized
+        static let captureError = "menu.captureError".localized
+        static let captureForClaude = "menu.captureForClaude".localized
+        static let captureCode = "menu.captureCode".localized
         static let selectScreen = "menu.selectScreen".localized
         static let allScreens = "menu.allScreens".localized
         static let mainScreen = "menu.mainScreen".localized
@@ -56,6 +59,12 @@ enum L10n {
         static let pin = "overlay.pin".localized
         static let close = "overlay.close".localized
         static let justNow = "overlay.justNow".localized
+        enum Backdrop {
+            static let none = "overlay.backdrop.none".localized
+            static let white = "overlay.backdrop.white".localized
+            static let dark = "overlay.backdrop.dark".localized
+            static let gradient = "overlay.backdrop.gradient".localized
+        }
     }
 
     // MARK: - Annotation Editor
@@ -99,6 +108,8 @@ enum L10n {
         static let autoCopyDescription = "settings.autoCopy.description".localized
         static let hideDesktopIcons = "settings.hideDesktopIcons".localized
         static let hideDesktopIconsDescription = "settings.hideDesktopIcons.description".localized
+        static let freezeScreen = "settings.freezeScreen".localized
+        static let freezeScreenDescription = "settings.freezeScreen.description".localized
         static let storage = "settings.storage".localized
         static let saveLocation = "settings.saveLocation".localized
         static let choose = "settings.choose".localized
@@ -117,6 +128,12 @@ enum L10n {
         static let pixelRuler = "settings.pixelRuler".localized
         static let timedCapture = "settings.timedCapture".localized
         static let activeWindowCapture = "settings.activeWindowCapture".localized
+        static let unifiedCapture = "settings.unifiedCapture".localized
+        static let captureError = "settings.captureError".localized
+        static let captureForClaude = "settings.captureForClaude".localized
+        static let captureCode = "settings.captureCode".localized
+        static let recaptureLastArea = "settings.recaptureLastArea".localized
+        static let captureWindowShadow = "settings.captureWindowShadow".localized
         static let recording = "settings.recording".localized
         static let permissions = "settings.permissions".localized
         static let permissionsDescription = "settings.permissions.description".localized

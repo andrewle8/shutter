@@ -22,6 +22,9 @@
 "menu.history" = "History";
 "menu.paste" = "Paste";
 "menu.ocrPaste" = "OCR Paste";
+"menu.captureError" = "Capture Error";
+"menu.captureForClaude" = "Capture for Claude";
+"menu.captureCode" = "Capture Code";
 "menu.selectScreen" = "Select screen";
 "menu.allScreens" = "All Screens";
 "menu.mainScreen" = "Main";
@@ -43,6 +46,10 @@
 "overlay.close" = "Close";
 "overlay.justNow" = "Just now";
 "overlay.copied" = "Copied";
+"overlay.backdrop.none" = "None";
+"overlay.backdrop.white" = "White";
+"overlay.backdrop.dark" = "Dark";
+"overlay.backdrop.gradient" = "Gradient";
 
 // MARK: - Annotation Editor
 "annotation.title" = "Annotation Editor";
@@ -83,6 +90,10 @@
 "settings.showOverlay.description" = "Display overlay with actions after capturing";
 "settings.hideDesktopIcons" = "Hide desktop icons";
 "settings.hideDesktopIcons.description" = "Temporarily hide icons during fullscreen capture";
+"settings.freezeScreen" = "Freeze screen before capture";
+"settings.freezeScreen.description" = "Capture screen contents before showing selection overlay, preserving tooltips and menus";
+"settings.captureWindowShadow" = "Include window shadow";
+"settings.captureWindowShadow.description" = "Include the window shadow in window captures";
 "settings.storage" = "Storage";
 "settings.saveLocation" = "Save location";
 "settings.choose" = "Choose";
@@ -101,6 +112,11 @@
 "settings.pixelRuler" = "Pixel ruler";
 "settings.timedCapture" = "Timed capture";
 "settings.activeWindowCapture" = "Active window capture";
+"settings.unifiedCapture" = "All-in-one capture";
+"settings.captureError" = "Capture error text";
+"settings.captureForClaude" = "Capture for Claude";
+"settings.captureCode" = "Capture code block";
+"settings.recaptureLastArea" = "Re-capture last area";
 "settings.recording" = "Recording...";
 "settings.permissions" = "Accessibility permission required";
 "settings.permissions.description" = "Shutter needs accessibility access for global hotkeys to work.";
@@ -167,6 +183,7 @@
 
 // MARK: - Area Selection
 "areaSelection.instruction" = "Drag to select • Release to capture";
+"areaSelection.unifiedInstruction" = "Drag = area • Click = window • Return = fullscreen";
 
 // MARK: - Context Menu
 "contextMenu.appearance" = "Appearance";

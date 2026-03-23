@@ -385,12 +385,14 @@ struct AppSettings: Codable {
     var llmApiKey: String {
         get {
             switch llmProvider {
+            case .local: return ""
             case .anthropic: return anthropicApiKey
             case .openai: return openaiApiKey
             }
         }
         set {
             switch llmProvider {
+            case .local: break
             case .anthropic: anthropicApiKey = newValue
             case .openai: openaiApiKey = newValue
             }
@@ -409,6 +411,9 @@ struct AppSettings: Codable {
         case defaultRedactionStyle, defaultRedactionIntensity, defaultStepCounterFormat
         case showInDock
         case saveHistory, maxHistoryItems
+        case freezeScreenBeforeCapture
+        case captureWindowShadow
+        case quickOverlayAutoDismiss, quickOverlayTimeout
         // Legacy key for backward compatibility
         case llmApiKey
     }
@@ -461,6 +466,10 @@ struct AppSettings: Codable {
         showInDock = try container.decodeIfPresent(Bool.self, forKey: .showInDock) ?? false
         saveHistory = try container.decodeIfPresent(Bool.self, forKey: .saveHistory) ?? true
         maxHistoryItems = try container.decodeIfPresent(Int.self, forKey: .maxHistoryItems) ?? 100
+        freezeScreenBeforeCapture = try container.decodeIfPresent(Bool.self, forKey: .freezeScreenBeforeCapture) ?? true
+        captureWindowShadow = try container.decodeIfPresent(Bool.self, forKey: .captureWindowShadow) ?? true
+        quickOverlayAutoDismiss = try container.decodeIfPresent(Bool.self, forKey: .quickOverlayAutoDismiss) ?? true
+        quickOverlayTimeout = try container.decodeIfPresent(Double.self, forKey: .quickOverlayTimeout) ?? 5.0
     }
 
     // Custom encoder - don't encode the computed llmApiKey
@@ -493,6 +502,10 @@ struct AppSettings: Codable {
         try container.encode(showInDock, forKey: .showInDock)
         try container.encode(saveHistory, forKey: .saveHistory)
         try container.encode(maxHistoryItems, forKey: .maxHistoryItems)
+        try container.encode(freezeScreenBeforeCapture, forKey: .freezeScreenBeforeCapture)
+        try container.encode(captureWindowShadow, forKey: .captureWindowShadow)
+        try container.encode(quickOverlayAutoDismiss, forKey: .quickOverlayAutoDismiss)
+        try container.encode(quickOverlayTimeout, forKey: .quickOverlayTimeout)
     }
     var autoCopyToClipboard: Bool
     var hideDesktopIcons: Bool
@@ -517,6 +530,10 @@ struct AppSettings: Codable {
     var showInDock: Bool
     var saveHistory: Bool
     var maxHistoryItems: Int
+    var freezeScreenBeforeCapture: Bool
+    var captureWindowShadow: Bool
+    var quickOverlayAutoDismiss: Bool
+    var quickOverlayTimeout: Double
 
     // Memberwise init (needed because we have custom Codable)
     init(
@@ -546,7 +563,11 @@ struct AppSettings: Codable {
         defaultStepCounterFormat: StepCounterFormat,
         showInDock: Bool,
         saveHistory: Bool,
-        maxHistoryItems: Int
+        maxHistoryItems: Int,
+        freezeScreenBeforeCapture: Bool = true,
+        captureWindowShadow: Bool = true,
+        quickOverlayAutoDismiss: Bool = true,
+        quickOverlayTimeout: Double = 5.0
     ) {
         self.anthropicApiKey = anthropicApiKey
         self.openaiApiKey = openaiApiKey
@@ -575,6 +596,10 @@ struct AppSettings: Codable {
         self.showInDock = showInDock
         self.saveHistory = saveHistory
         self.maxHistoryItems = maxHistoryItems
+        self.freezeScreenBeforeCapture = freezeScreenBeforeCapture
+        self.captureWindowShadow = captureWindowShadow
+        self.quickOverlayAutoDismiss = quickOverlayAutoDismiss
+        self.quickOverlayTimeout = quickOverlayTimeout
     }
 
     static var `default`: AppSettings {
@@ -584,7 +609,7 @@ struct AppSettings: Codable {
         return AppSettings(
             anthropicApiKey: "",
             openaiApiKey: "",
-            llmProvider: .anthropic,
+            llmProvider: .local,
             saveLocation: screenshotsPath,
             autoCopyToClipboard: true,
             hideDesktopIcons: false,
@@ -608,7 +633,11 @@ struct AppSettings: Codable {
             defaultStepCounterFormat: .numeric,
             showInDock: false,
             saveHistory: true,
-            maxHistoryItems: 100
+            maxHistoryItems: 100,
+            freezeScreenBeforeCapture: true,
+            captureWindowShadow: true,
+            quickOverlayAutoDismiss: true,
+            quickOverlayTimeout: 5.0
         )
     }
 
@@ -635,13 +664,22 @@ struct AppSettings: Codable {
 }
 
 enum LLMProvider: String, Codable, CaseIterable {
+    case local = "Apple Intelligence"
     case anthropic = "Anthropic"
     case openai = "OpenAI"
 
     var baseURL: String {
         switch self {
+        case .local: return ""
         case .anthropic: return "https://api.anthropic.com/v1"
         case .openai: return "https://api.openai.com/v1"
+        }
+    }
+
+    var requiresAPIKey: Bool {
+        switch self {
+        case .local: return false
+        case .anthropic, .openai: return true
         }
     }
 }
@@ -659,10 +697,18 @@ struct HotkeySettings: Codable {
     var pixelRuler: String
     var timedCapture: String
     var activeWindowCapture: String
+    var unifiedCapture: String
+    var captureError: String
+    var captureForClaude: String
+    var captureCode: String
+    var recaptureLastArea: String
 
     enum CodingKeys: String, CodingKey {
         case areaCapture, windowCapture, fullscreenCapture, autoPasteCapture, ocrPasteCapture, allScreensCapture
         case scrollingCapture, ocrCapture, colorPicker, pixelRuler, timedCapture, activeWindowCapture
+        case unifiedCapture
+        case captureError, captureForClaude, captureCode
+        case recaptureLastArea
     }
 
     init(
@@ -677,7 +723,12 @@ struct HotkeySettings: Codable {
         colorPicker: String = "⌘⇧C",
         pixelRuler: String = "⌘⇧R",
         timedCapture: String = "⌘⇧T",
-        activeWindowCapture: String = "⌘⇧W"
+        activeWindowCapture: String = "⌘⇧W",
+        unifiedCapture: String = "⌘⇧1",
+        captureError: String = "⌘⇧E",
+        captureForClaude: String = "⌘⇧F",
+        captureCode: String = "⌘⇧`",
+        recaptureLastArea: String = "⌘⇧L"
     ) {
         self.areaCapture = areaCapture
         self.windowCapture = windowCapture
@@ -691,6 +742,11 @@ struct HotkeySettings: Codable {
         self.pixelRuler = pixelRuler
         self.timedCapture = timedCapture
         self.activeWindowCapture = activeWindowCapture
+        self.unifiedCapture = unifiedCapture
+        self.captureError = captureError
+        self.captureForClaude = captureForClaude
+        self.captureCode = captureCode
+        self.recaptureLastArea = recaptureLastArea
     }
 
     init(from decoder: Decoder) throws {
@@ -707,6 +763,11 @@ struct HotkeySettings: Codable {
         pixelRuler = try container.decodeIfPresent(String.self, forKey: .pixelRuler) ?? "⌘⇧R"
         timedCapture = try container.decodeIfPresent(String.self, forKey: .timedCapture) ?? "⌘⇧T"
         activeWindowCapture = try container.decodeIfPresent(String.self, forKey: .activeWindowCapture) ?? "⌘⇧W"
+        unifiedCapture = try container.decodeIfPresent(String.self, forKey: .unifiedCapture) ?? "⌘⇧1"
+        captureError = try container.decodeIfPresent(String.self, forKey: .captureError) ?? "⌘⇧E"
+        captureForClaude = try container.decodeIfPresent(String.self, forKey: .captureForClaude) ?? "⌘⇧F"
+        captureCode = try container.decodeIfPresent(String.self, forKey: .captureCode) ?? "⌘⇧`"
+        recaptureLastArea = try container.decodeIfPresent(String.self, forKey: .recaptureLastArea) ?? "⌘⇧L"
     }
 
     static var `default`: HotkeySettings {
@@ -722,7 +783,12 @@ struct HotkeySettings: Codable {
             colorPicker: "⌘⇧C",
             pixelRuler: "⌘⇧R",
             timedCapture: "⌘⇧T",
-            activeWindowCapture: "⌘⇧W"
+            activeWindowCapture: "⌘⇧W",
+            unifiedCapture: "⌘⇧1",
+            captureError: "⌘⇧E",
+            captureForClaude: "⌘⇧F",
+            captureCode: "⌘⇧`",
+            recaptureLastArea: "⌘⇧L"
         )
     }
 }

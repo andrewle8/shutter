@@ -120,7 +120,7 @@ struct MenuBarView: View {
                 label: L10n.Menu.window,
                 shortcut: "\u{2318}\u{21E7}5"
             ) {
-                startWindowPickerCapture()
+                startCapture(type: .window)
             }
 
             CaptureRow(
@@ -258,13 +258,6 @@ struct MenuBarView: View {
         NSApp.sendAction(#selector(AppDelegate.closePopover), to: nil, from: nil)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
             captureService.startCapture(type: type)
-        }
-    }
-
-    private func startWindowPickerCapture() {
-        NSApp.sendAction(#selector(AppDelegate.closePopover), to: nil, from: nil)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-            ScreenCaptureService.shared.showWindowPickerUI()
         }
     }
 

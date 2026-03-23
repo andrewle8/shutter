@@ -810,57 +810,78 @@ struct AISettingsTab: View {
                             }
                         }
 
-                        Divider()
+                        if settingsManager.settings.llmProvider == .local {
+                            // Local AI info
+                            Divider()
 
-                        // API Key field
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(L10n.Settings.apiKey)
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(.secondary)
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.green)
+                                    Text("Uses on-device AI. No API key required.")
+                                        .font(.system(size: 12, weight: .medium))
+                                        .foregroundColor(.secondary)
+                                }
 
-                            HStack(spacing: 8) {
-                                Group {
-                                    if showAPIKey {
-                                        TextField(L10n.Settings.apiKeyPlaceholder, text: $settingsManager.settings.llmApiKey)
-                                    } else {
-                                        SecureField(L10n.Settings.apiKeyPlaceholder, text: $settingsManager.settings.llmApiKey)
+                                Text("Descriptions are generated locally using Apple Intelligence. Processing is private and free.")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.secondary.opacity(0.8))
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        } else {
+                            Divider()
+
+                            // API Key field
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(L10n.Settings.apiKey)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(.secondary)
+
+                                HStack(spacing: 8) {
+                                    Group {
+                                        if showAPIKey {
+                                            TextField(L10n.Settings.apiKeyPlaceholder, text: $settingsManager.settings.llmApiKey)
+                                        } else {
+                                            SecureField(L10n.Settings.apiKeyPlaceholder, text: $settingsManager.settings.llmApiKey)
+                                        }
+                                    }
+                                    .textFieldStyle(.plain)
+                                    .font(.system(size: 12, design: .monospaced))
+                                    .padding(10)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(Color.primary.opacity(0.04))
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                                            )
+                                    )
+
+                                    Button(action: { showAPIKey.toggle() }) {
+                                        Image(systemName: showAPIKey ? "eye.slash" : "eye")
+                                            .font(.system(size: 14))
+                                            .foregroundColor(isHoveredEye ? .primary : .secondary)
+                                            .frame(width: 32, height: 32)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 6)
+                                                    .fill(Color.primary.opacity(isHoveredEye ? 0.08 : 0.04))
+                                            )
+                                    }
+                                    .buttonStyle(.plain)
+                                    .onHover { hovering in
+                                        isHoveredEye = hovering
                                     }
                                 }
-                                .textFieldStyle(.plain)
-                                .font(.system(size: 12, design: .monospaced))
-                                .padding(10)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .fill(Color.primary.opacity(0.04))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(Color.primary.opacity(0.08), lineWidth: 1)
-                                        )
-                                )
 
-                                Button(action: { showAPIKey.toggle() }) {
-                                    Image(systemName: showAPIKey ? "eye.slash" : "eye")
-                                        .font(.system(size: 14))
-                                        .foregroundColor(isHoveredEye ? .primary : .secondary)
-                                        .frame(width: 32, height: 32)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 6)
-                                                .fill(Color.primary.opacity(isHoveredEye ? 0.08 : 0.04))
-                                        )
+                                HStack(spacing: 4) {
+                                    Image(systemName: "lock.shield")
+                                        .font(.system(size: 10))
+                                    Text(L10n.Settings.apiKeySecure)
+                                        .font(.system(size: 10))
                                 }
-                                .buttonStyle(.plain)
-                                .onHover { hovering in
-                                    isHoveredEye = hovering
-                                }
+                                .foregroundColor(.secondary)
                             }
-
-                            HStack(spacing: 4) {
-                                Image(systemName: "lock.shield")
-                                    .font(.system(size: 10))
-                                Text(L10n.Settings.apiKeySecure)
-                                    .font(.system(size: 10))
-                            }
-                            .foregroundColor(.secondary)
                         }
                     }
                 }
@@ -883,6 +904,7 @@ struct ProviderButton: View {
 
     private var providerIcon: String {
         switch provider {
+        case .local: return "apple.logo"
         case .anthropic: return "sparkle"
         case .openai: return "brain"
         }

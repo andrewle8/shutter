@@ -22,6 +22,9 @@
 "menu.history" = "Verlauf";
 "menu.paste" = "Einfügen";
 "menu.ocrPaste" = "OCR Paste";
+"menu.captureError" = "Fehler aufnehmen";
+"menu.captureForClaude" = "Aufnahme für Claude";
+"menu.captureCode" = "Code aufnehmen";
 "menu.selectScreen" = "Bildschirm auswählen";
 "menu.allScreens" = "Alle Bildschirme";
 "menu.mainScreen" = "Haupt";
@@ -43,6 +46,10 @@
 "overlay.close" = "Schließen";
 "overlay.justNow" = "Gerade eben";
 "overlay.copied" = "Kopiert";
+"overlay.backdrop.none" = "Kein";
+"overlay.backdrop.white" = "Weiß";
+"overlay.backdrop.dark" = "Dunkel";
+"overlay.backdrop.gradient" = "Verlauf";
 
 // MARK: - Annotation Editor
 "annotation.title" = "Anmerkungseditor";
@@ -83,6 +90,10 @@
 "settings.showOverlay.description" = "Aktionsleiste nach der Aufnahme anzeigen";
 "settings.hideDesktopIcons" = "Desktop-Symbole ausblenden";
 "settings.hideDesktopIcons.description" = "Symbole während der Vollbildaufnahme ausblenden";
+"settings.freezeScreen" = "Bildschirm vor Aufnahme einfrieren";
+"settings.freezeScreen.description" = "Bildschirminhalt vor der Auswahl erfassen, um Tooltips und Menüs zu bewahren";
+"settings.captureWindowShadow" = "Fensterschatten einbeziehen";
+"settings.captureWindowShadow.description" = "Fensterschatten in Fensteraufnahmen einbeziehen";
 "settings.storage" = "Speicher";
 "settings.saveLocation" = "Speicherort";
 "settings.choose" = "Auswählen";
@@ -101,6 +112,11 @@
 "settings.pixelRuler" = "Pixellineal";
 "settings.timedCapture" = "Zeitgesteuerte Aufnahme";
 "settings.activeWindowCapture" = "Aktives Fenster aufnehmen";
+"settings.unifiedCapture" = "All-in-One-Aufnahme";
+"settings.captureError" = "Fehlertext aufnehmen";
+"settings.captureForClaude" = "Aufnahme für Claude";
+"settings.captureCode" = "Codeblock aufnehmen";
+"settings.recaptureLastArea" = "Letzte Bereichsaufnahme wiederholen";
 "settings.recording" = "Aufnahme...";
 "settings.permissions" = "Bedienungshilfen-Berechtigung erforderlich";
 "settings.permissions.description" = "Shutter benötigt Bedienungshilfen-Zugriff für globale Tastenkürzel.";
@@ -167,6 +183,7 @@
 
 // MARK: - Area Selection
 "areaSelection.instruction" = "Ziehen zum Auswählen • Loslassen zum Aufnehmen";
+"areaSelection.unifiedInstruction" = "Ziehen = Bereich • Klick = Fenster • Return = Vollbild";
 
 // MARK: - Context Menu
 "contextMenu.appearance" = "Erscheinungsbild";

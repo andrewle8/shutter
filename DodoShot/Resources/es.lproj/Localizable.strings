@@ -22,6 +22,9 @@
 "menu.history" = "Historial";
 "menu.paste" = "Pegar";
 "menu.ocrPaste" = "OCR Paste";
+"menu.captureError" = "Capturar error";
+"menu.captureForClaude" = "Captura para Claude";
+"menu.captureCode" = "Capturar código";
 "menu.selectScreen" = "Seleccionar pantalla";
 "menu.allScreens" = "Todas las pantallas";
 "menu.mainScreen" = "Principal";
@@ -43,6 +46,10 @@
 "overlay.close" = "Cerrar";
 "overlay.justNow" = "Ahora mismo";
 "overlay.copied" = "Copiado";
+"overlay.backdrop.none" = "Ninguno";
+"overlay.backdrop.white" = "Blanco";
+"overlay.backdrop.dark" = "Oscuro";
+"overlay.backdrop.gradient" = "Degradado";
 
 // MARK: - Annotation Editor
 "annotation.title" = "Editor de anotaciones";

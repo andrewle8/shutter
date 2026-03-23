@@ -506,7 +506,8 @@ struct AnnotationEditorView: View {
         .frame(minWidth: 1100, idealWidth: showBackdropPanel ? 1300 : 1100, minHeight: 700)
         .background(Color(nsColor: .windowBackgroundColor))
         .onAppear {
-            hasLLMApiKey = !SettingsManager.shared.settings.llmApiKey.isEmpty
+            let settings = SettingsManager.shared.settings
+            hasLLMApiKey = settings.llmProvider == .local || !settings.llmApiKey.isEmpty
         }
     }
 

@@ -1,5 +1,10 @@
 import Foundation
 import AppKit
+import Vision
+
+#if canImport(FoundationModels)
+import FoundationModels
+#endif
 
 /// Service for generating AI descriptions of screenshots
 class LLMService {
@@ -14,6 +19,25 @@ class LLMService {
     func describeImage(_ image: NSImage, completion: @escaping (Result<String, Error>) -> Void) {
         let settings = SettingsManager.shared.settings
 
+        switch settings.llmProvider {
+        case .local:
+            Task {
+                do {
+                    let description = try await describeWithLocal(image: image)
+                    DispatchQueue.main.async {
+                        completion(.success(description))
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        completion(.failure(error))
+                    }
+                }
+            }
+            return
+        case .anthropic, .openai:
+            break
+        }
+
         guard !settings.llmApiKey.isEmpty else {
             completion(.failure(LLMError.noAPIKey))
             return
@@ -25,6 +49,8 @@ class LLMService {
         }
 
         switch settings.llmProvider {
+        case .local:
+            break // handled above
         case .anthropic:
             describeWithAnthropic(base64Image: base64Image, apiKey: settings.llmApiKey, completion: completion)
         case .openai:
@@ -45,6 +71,122 @@ class LLMService {
                 }
             }
         }
+    }
+
+    // MARK: - Local (Apple Intelligence)
+
+    private func describeWithLocal(image: NSImage) async throws -> String {
+        // Extract text and visual context from the image using Vision framework,
+        // then use the on-device language model to generate a coherent description.
+        let context = try await extractImageContext(from: image)
+
+        #if canImport(FoundationModels)
+        if #available(macOS 26.0, *) {
+            return try await describeWithFoundationModels(context: context)
+        }
+        #endif
+
+        // Fallback: construct a description from Vision analysis alone
+        return buildFallbackDescription(from: context)
+    }
+
+    /// Context extracted from an image via Vision framework
+    private struct ImageContext {
+        var ocrText: String = ""
+        var barcodes: [String] = []
+        var faces: Int = 0
+        var imageSize: CGSize = .zero
+    }
+
+    private func extractImageContext(from image: NSImage) async throws -> ImageContext {
+        guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            throw LLMError.invalidImage
+        }
+
+        var context = ImageContext()
+        context.imageSize = image.size
+
+        // Run OCR
+        let ocrRequest = VNRecognizeTextRequest()
+        ocrRequest.recognitionLevel = .accurate
+        ocrRequest.usesLanguageCorrection = true
+
+        // Run face detection
+        let faceRequest = VNDetectFaceRectanglesRequest()
+
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        try handler.perform([ocrRequest, faceRequest])
+
+        // Collect OCR text
+        if let observations = ocrRequest.results {
+            let lines = observations.compactMap { $0.topCandidates(1).first?.string }
+            context.ocrText = lines.joined(separator: "\n")
+        }
+
+        // Count faces
+        if let faceResults = faceRequest.results {
+            context.faces = faceResults.count
+        }
+
+        return context
+    }
+
+    #if canImport(FoundationModels)
+    @available(macOS 26.0, *)
+    private func describeWithFoundationModels(context: ImageContext) async throws -> String {
+        guard SystemLanguageModel.default.isAvailable else {
+            throw LLMError.localModelUnavailable
+        }
+
+        let session = LanguageModelSession()
+
+        var promptParts: [String] = []
+        promptParts.append("Based on the following analysis of a screenshot, write a concise description (under 100 words) of what the screenshot shows. Focus on the main content and purpose.")
+        promptParts.append("")
+        promptParts.append("Image dimensions: \(Int(context.imageSize.width))x\(Int(context.imageSize.height))")
+
+        if !context.ocrText.isEmpty {
+            let truncatedText = String(context.ocrText.prefix(2000))
+            promptParts.append("")
+            promptParts.append("Text found in the image:")
+            promptParts.append(truncatedText)
+        }
+
+        if context.faces > 0 {
+            promptParts.append("")
+            promptParts.append("Number of faces detected: \(context.faces)")
+        }
+
+        if context.ocrText.isEmpty && context.faces == 0 {
+            promptParts.append("")
+            promptParts.append("No text or faces were detected. This may be a graphic, photo, or UI with minimal text.")
+        }
+
+        let prompt = promptParts.joined(separator: "\n")
+        let response = try await session.respond(to: prompt)
+        return response.content.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    #endif
+
+    private func buildFallbackDescription(from context: ImageContext) -> String {
+        var parts: [String] = []
+
+        if !context.ocrText.isEmpty {
+            let preview = String(context.ocrText.prefix(200))
+            parts.append("Screenshot containing text: \"\(preview)\"")
+        }
+
+        if context.faces > 0 {
+            parts.append("\(context.faces) face(s) detected")
+        }
+
+        let dimensions = "\(Int(context.imageSize.width))x\(Int(context.imageSize.height))"
+
+        if parts.isEmpty {
+            return "Screenshot (\(dimensions)) — no text detected. Apple Intelligence is required for detailed descriptions on this macOS version."
+        }
+
+        return parts.joined(separator: ". ") + " (\(dimensions))"
     }
 
     // MARK: - Anthropic API
@@ -239,6 +381,7 @@ enum LLMError: LocalizedError {
     case noResponse
     case invalidResponse
     case apiError(String)
+    case localModelUnavailable
 
     var errorDescription: String? {
         switch self {
@@ -254,6 +397,8 @@ enum LLMError: LocalizedError {
             return "Invalid response from API"
         case .apiError(let message):
             return message
+        case .localModelUnavailable:
+            return "Apple Intelligence is not available on this device. Please use macOS 26 or later on Apple Silicon, or switch to a cloud provider in Settings."
         }
     }
 }
