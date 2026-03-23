@@ -601,6 +601,12 @@ struct AnnotationEditorView: View {
                     },
                     onTextAdded: { text, position in
                         addTextAnnotationDirect(text: text, position: position)
+                    },
+                    onSaveAndClose: {
+                        saveImage()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            onCancel()
+                        }
                     }
                     )
                 )
@@ -2302,6 +2308,7 @@ struct AnnotationCanvasView: NSViewRepresentable {
     var onPushUndoState: (() -> Void)?
     var onColorPicked: ((Color, String) -> Void)?
     var onTextAdded: ((String, CGPoint) -> Void)?
+    var onSaveAndClose: (() -> Void)?
 
     func makeNSView(context: Context) -> AnnotationCanvasNSView {
         let view = AnnotationCanvasNSView()
@@ -2330,6 +2337,7 @@ struct AnnotationCanvasView: NSViewRepresentable {
         nsView.onSendToBack = onSendToBack
         nsView.onColorPicked = onColorPicked
         nsView.onTextAdded = onTextAdded
+        nsView.onSaveAndClose = onSaveAndClose
         nsView.needsDisplay = true
     }
 
@@ -2589,6 +2597,7 @@ class AnnotationCanvasNSView: NSView, NSTextFieldDelegate {
     var onSendToBack: (() -> Void)?
     var onColorPicked: ((Color, String) -> Void)?
     var onTextAdded: ((String, CGPoint) -> Void)?
+    var onSaveAndClose: (() -> Void)?
     var sourceImage: NSImage?
 
     private var trackingArea: NSTrackingArea?
@@ -2868,6 +2877,12 @@ class AnnotationCanvasNSView: NSView, NSTextFieldDelegate {
                 onDuplicate?()
                 return true
             }
+        }
+
+        // CMD+S = Save and close
+        if flags == .command && chars == "s" {
+            onSaveAndClose?()
+            return true
         }
 
         return super.performKeyEquivalent(with: event)
