@@ -4,31 +4,52 @@ struct SettingsView: View {
     @ObservedObject private var settingsManager = SettingsManager.shared
     @State private var selectedTab = 0
 
+    private let tabs = [
+        (L10n.Settings.general, "gearshape"),
+        (L10n.Settings.shortcuts, "keyboard"),
+        (L10n.Settings.ai, "sparkles"),
+        (L10n.Settings.about, "info.circle"),
+    ]
+
     var body: some View {
-        TabView(selection: $selectedTab) {
-            GeneralSettingsTab()
-                .tabItem {
-                    Label(L10n.Settings.general, systemImage: "gearshape")
+        VStack(spacing: 0) {
+            // Manual tab bar (replaces TabView which fails in NSHostingView on macOS 26)
+            HStack(spacing: 2) {
+                ForEach(0..<tabs.count, id: \.self) { index in
+                    Button(action: { selectedTab = index }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: tabs[index].1)
+                                .font(.system(size: 11))
+                            Text(tabs[index].0)
+                                .font(.system(size: 12, weight: .medium))
+                        }
+                        .foregroundColor(selectedTab == index ? .white : .secondary)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 7)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(selectedTab == index ? Color.accentColor : Color.clear)
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
-                .tag(0)
+            }
+            .padding(.top, 12)
+            .padding(.bottom, 8)
 
-            HotkeysSettingsTab()
-                .tabItem {
-                    Label(L10n.Settings.shortcuts, systemImage: "keyboard")
-                }
-                .tag(1)
+            Divider()
 
-            AISettingsTab()
-                .tabItem {
-                    Label(L10n.Settings.ai, systemImage: "sparkles")
+            // Tab content
+            Group {
+                switch selectedTab {
+                case 0: GeneralSettingsTab()
+                case 1: HotkeysSettingsTab()
+                case 2: AISettingsTab()
+                case 3: AboutTab()
+                default: GeneralSettingsTab()
                 }
-                .tag(2)
-
-            AboutTab()
-                .tabItem {
-                    Label(L10n.Settings.about, systemImage: "info.circle")
-                }
-                .tag(3)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(width: 520, height: 420)
     }

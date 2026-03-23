@@ -2,31 +2,70 @@ import SwiftUI
 
 struct MenuBarView: View {
     @ObservedObject private var captureService = ScreenCaptureService.shared
+    @State private var showSettings = false
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            headerSection
+        Group {
+            if showSettings {
+                // Settings view embedded in popover
+                VStack(spacing: 0) {
+                    // Back button header
+                    HStack {
+                        Button(action: { withAnimation(.easeInOut(duration: 0.15)) { showSettings = false } }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 11, weight: .semibold))
+                                Text("Back")
+                                    .font(.system(size: 12, weight: .medium))
+                            }
+                            .foregroundColor(.secondary)
+                        }
+                        .buttonStyle(.plain)
 
-            // Main capture options (prominent)
-            mainCaptureSection
+                        Spacer()
 
-            // Divider with label
-            sectionDivider(label: L10n.Menu.tools)
+                        Text("Settings")
+                            .font(.system(size: 13, weight: .semibold))
 
-            // Tools section (secondary)
-            toolsSection
+                        Spacer()
+                        // Spacer to balance the back button
+                        Color.clear.frame(width: 50, height: 1)
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
 
-            // Recent captures
-            if !captureService.recentCaptures.isEmpty {
-                sectionDivider(label: L10n.Menu.recentCaptures)
-                recentCapturesSection
+                    Divider()
+
+                    SettingsView()
+                }
+                .frame(width: 520, height: 460)
+            } else {
+                // Main menu view
+                VStack(spacing: 0) {
+                    // Header
+                    headerSection
+
+                    // Main capture options (prominent)
+                    mainCaptureSection
+
+                    // Divider with label
+                    sectionDivider(label: L10n.Menu.tools)
+
+                    // Tools section (secondary)
+                    toolsSection
+
+                    // Recent captures
+                    if !captureService.recentCaptures.isEmpty {
+                        sectionDivider(label: L10n.Menu.recentCaptures)
+                        recentCapturesSection
+                    }
+
+                    // Footer
+                    footerSection
+                }
+                .frame(width: 300)
             }
-
-            // Footer
-            footerSection
         }
-        .frame(width: 300)
         .background(
             ZStack {
                 VisualEffectBlur(material: .popover, blendingMode: .behindWindow)
@@ -299,11 +338,8 @@ struct MenuBarView: View {
     }
 
     private func openSettings() {
-        NSApp.sendAction(#selector(AppDelegate.closePopover), to: nil, from: nil)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            if let appDelegate = NSApp.delegate as? AppDelegate {
-                appDelegate.openSettingsWindow()
-            }
+        withAnimation(.easeInOut(duration: 0.15)) {
+            showSettings = true
         }
     }
 
