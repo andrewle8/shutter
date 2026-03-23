@@ -1131,8 +1131,14 @@ class ScreenCaptureService: ObservableObject {
             copyToClipboard(screenshot)
         }
 
+        // If "copy only" mode: skip editor entirely
+        if SettingsManager.shared.settings.skipEditorAfterCapture {
+            isCapturing = false
+            NSLog("[ScreenCaptureService] completeCapture finished (copy only, no editor)")
+            return
+        }
+
         // Open the annotation editor
-        // Pass the PNG data and metadata directly to avoid any reference issues
         openEditorDirectly(
             pngData: pngData,
             imageSize: imageSize,

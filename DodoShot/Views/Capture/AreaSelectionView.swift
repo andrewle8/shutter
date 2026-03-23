@@ -97,7 +97,7 @@ struct AreaSelectionView: View {
                     onReturnKey: onFullscreen
                 )
 
-                // Frozen background image (when freeze-before-capture is active)
+                // Frozen background (when freeze-before-capture is active)
                 if let frozenBG = frozenBackground {
                     Image(nsImage: NSImage(cgImage: frozenBG, size: geometry.size))
                         .resizable()
@@ -105,50 +105,21 @@ struct AreaSelectionView: View {
                         .allowsHitTesting(false)
                 }
 
-                // Semi-transparent overlay
-                Color.black.opacity(0.3)
-                    .allowsHitTesting(false)
-
-                // Selection rectangle
+                // Selection box — thin white border, no overlay dimming
                 if let start = startPoint, let current = currentPoint {
                     let rect = buildSelectionRect(from: start, to: current)
 
-                    // Clear hole in overlay
-                    Rectangle()
-                        .fill(Color.clear)
-                        .frame(width: rect.width, height: rect.height)
-                        .position(x: rect.midX, y: rect.midY)
-                        .blendMode(.destinationOut)
-                        .allowsHitTesting(false)
-
-                    // Selection border
                     SelectionBorder(rect: rect)
                         .allowsHitTesting(false)
 
-                    // Dimension label
                     DimensionLabel(rect: rect, shiftHeld: shiftHeld)
                         .allowsHitTesting(false)
                 }
 
-                // Crosshair when not dragging
+                // FPS crosshair when not dragging
                 if !isDragging {
                     CrosshairView(position: mouseLocation, size: geometry.size)
                         .allowsHitTesting(false)
-                }
-
-                // Instructions
-                if !isDragging {
-                    VStack {
-                        if onWindowClick != nil || onFullscreen != nil {
-                            InstructionBadge(text: L10n.AreaSelection.unifiedInstruction)
-                                .padding(.top, 60)
-                        } else {
-                            InstructionBadge(text: L10n.AreaSelection.instruction)
-                                .padding(.top, 60)
-                        }
-                        Spacer()
-                    }
-                    .allowsHitTesting(false)
                 }
             }
             .compositingGroup()
@@ -377,40 +348,47 @@ struct DimensionLabel: View {
     }
 }
 
-// MARK: - Crosshair View
+// MARK: - Crosshair View (FPS / Quake-inspired minimal crosshair)
 struct CrosshairView: View {
     let position: CGPoint
     let size: CGSize
 
+    private let gap: CGFloat = 4      // gap from center
+    private let armLength: CGFloat = 8 // length of each arm
+    private let thickness: CGFloat = 1.5
+
     var body: some View {
         ZStack {
-            // Horizontal line
+            // Four short arms with a gap in the center — FPS style
+            // Top arm
             Rectangle()
-                .fill(Color.white.opacity(0.5))
-                .frame(width: size.width, height: 1)
-                .position(x: size.width / 2, y: position.y)
+                .fill(Color.white)
+                .frame(width: thickness, height: armLength)
+                .position(x: position.x, y: position.y - gap - armLength / 2)
 
-            // Vertical line
+            // Bottom arm
             Rectangle()
-                .fill(Color.white.opacity(0.5))
-                .frame(width: 1, height: size.height)
-                .position(x: position.x, y: size.height / 2)
+                .fill(Color.white)
+                .frame(width: thickness, height: armLength)
+                .position(x: position.x, y: position.y + gap + armLength / 2)
 
-            // Center crosshair
-            ZStack {
-                Circle()
-                    .stroke(Color.white, lineWidth: 2)
-                    .frame(width: 20, height: 20)
+            // Left arm
+            Rectangle()
+                .fill(Color.white)
+                .frame(width: armLength, height: thickness)
+                .position(x: position.x - gap - armLength / 2, y: position.y)
 
-                Rectangle()
-                    .fill(Color.white)
-                    .frame(width: 1, height: 12)
+            // Right arm
+            Rectangle()
+                .fill(Color.white)
+                .frame(width: armLength, height: thickness)
+                .position(x: position.x + gap + armLength / 2, y: position.y)
 
-                Rectangle()
-                    .fill(Color.white)
-                    .frame(width: 12, height: 1)
-            }
-            .position(position)
+            // Tiny center dot
+            Circle()
+                .fill(Color.white)
+                .frame(width: 2, height: 2)
+                .position(position)
 
             // Coordinate label near crosshair
             CoordinateLabel(position: position, screenSize: size)

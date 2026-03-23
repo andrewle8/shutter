@@ -403,7 +403,7 @@ struct AppSettings: Codable {
     // Custom CodingKeys - exclude llmApiKey as it's computed
     enum CodingKeys: String, CodingKey {
         case anthropicApiKey, openaiApiKey, llmProvider, saveLocation, autoCopyToClipboard
-        case hideDesktopIcons, alwaysPasteToiTerm
+        case hideDesktopIcons, alwaysPasteToiTerm, skipEditorAfterCapture
         case hotkeys, appearanceMode, launchAtStartup, imageFormat, jpgQuality, webpQuality
         case defaultAnnotationColor, defaultStrokeWidth, defaultAnnotationTool
         case textAnnotationSettings, filenameTemplate, sequentialNumber
@@ -447,6 +447,7 @@ struct AppSettings: Codable {
         autoCopyToClipboard = try container.decode(Bool.self, forKey: .autoCopyToClipboard)
         hideDesktopIcons = try container.decode(Bool.self, forKey: .hideDesktopIcons)
         alwaysPasteToiTerm = try container.decodeIfPresent(Bool.self, forKey: .alwaysPasteToiTerm) ?? false
+        skipEditorAfterCapture = try container.decodeIfPresent(Bool.self, forKey: .skipEditorAfterCapture) ?? false
         hotkeys = try container.decode(HotkeySettings.self, forKey: .hotkeys)
         appearanceMode = try container.decode(AppearanceMode.self, forKey: .appearanceMode)
         launchAtStartup = try container.decode(Bool.self, forKey: .launchAtStartup)
@@ -487,6 +488,7 @@ struct AppSettings: Codable {
         try container.encode(autoCopyToClipboard, forKey: .autoCopyToClipboard)
         try container.encode(hideDesktopIcons, forKey: .hideDesktopIcons)
         try container.encode(alwaysPasteToiTerm, forKey: .alwaysPasteToiTerm)
+        try container.encode(skipEditorAfterCapture, forKey: .skipEditorAfterCapture)
         try container.encode(hotkeys, forKey: .hotkeys)
         try container.encode(appearanceMode, forKey: .appearanceMode)
         try container.encode(launchAtStartup, forKey: .launchAtStartup)
@@ -519,6 +521,7 @@ struct AppSettings: Codable {
     var autoCopyToClipboard: Bool
     var hideDesktopIcons: Bool
     var alwaysPasteToiTerm: Bool
+    var skipEditorAfterCapture: Bool
     var hotkeys: HotkeySettings
     var appearanceMode: AppearanceMode
     var launchAtStartup: Bool
@@ -557,6 +560,7 @@ struct AppSettings: Codable {
         autoCopyToClipboard: Bool,
         hideDesktopIcons: Bool,
         alwaysPasteToiTerm: Bool = false,
+        skipEditorAfterCapture: Bool = false,
         hotkeys: HotkeySettings,
         appearanceMode: AppearanceMode,
         launchAtStartup: Bool,
@@ -593,6 +597,7 @@ struct AppSettings: Codable {
         self.autoCopyToClipboard = autoCopyToClipboard
         self.hideDesktopIcons = hideDesktopIcons
         self.alwaysPasteToiTerm = alwaysPasteToiTerm
+        self.skipEditorAfterCapture = skipEditorAfterCapture
         self.hotkeys = hotkeys
         self.appearanceMode = appearanceMode
         self.launchAtStartup = launchAtStartup
@@ -635,6 +640,7 @@ struct AppSettings: Codable {
             autoCopyToClipboard: true,
             hideDesktopIcons: false,
             alwaysPasteToiTerm: false,
+            skipEditorAfterCapture: false,
             hotkeys: .default,
             appearanceMode: .dark,
             launchAtStartup: false,

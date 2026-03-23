@@ -205,6 +205,13 @@ struct MenuBarView: View {
                 }
                 .toggleStyle(DarkroomToggleStyle())
 
+                Toggle(isOn: $settingsManager.settings.skipEditorAfterCapture) {
+                    Text("Copy only")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.secondary)
+                }
+                .toggleStyle(DarkroomToggleStyle())
+
                 Spacer()
             }
             .padding(.horizontal, 14)
