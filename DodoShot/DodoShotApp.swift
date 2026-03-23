@@ -6,9 +6,11 @@ struct DodoShotApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        Settings {
-            SettingsView()
+        // Settings window is managed manually in AppDelegate to work with .accessory policy on macOS 26
+        WindowGroup("Hidden", id: "hidden") {
+            EmptyView()
         }
+        .defaultSize(width: 0, height: 0)
     }
 }
 
@@ -253,34 +255,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             popover.performClose(nil)
         }
 
-        // Create or show settings window
-        if settingsWindow == nil {
-            let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 520, height: 420),
-                styleMask: [.titled, .closable],
-                backing: .buffered,
-                defer: false
-            )
-            window.title = "DodoShot Settings"
-            window.center()
-            window.isReleasedWhenClosed = false
-            window.delegate = self
-            window.contentViewController = NSHostingController(rootView: SettingsView())
-            settingsWindow = window
-        }
+        // Always close and recreate — all working windows in this app create fresh each time
+        settingsWindow?.close()
+        settingsWindow = nil
 
-        // Temporarily switch to .regular so SwiftUI renders under .accessory policy (macOS 26)
-        NSApp.setActivationPolicy(.regular)
-        settingsWindow?.makeKeyAndOrderFront(nil)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 520, height: 420),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "DodoShot Settings"
+        window.backgroundColor = NSColor.windowBackgroundColor
+        window.collectionBehavior = [.managed, .participatesInCycle]
+        window.isReleasedWhenClosed = false
+        window.delegate = self
+        window.center()
+        window.contentView = NSHostingView(rootView: SettingsView())
+        window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+        settingsWindow = window
     }
 
     func windowWillClose(_ notification: Notification) {
         guard let window = notification.object as? NSWindow, window === settingsWindow else { return }
-        // Restore .accessory policy if user preference is no-dock
-        if !SettingsManager.shared.settings.showInDock {
-            NSApp.setActivationPolicy(.accessory)
-        }
+        settingsWindow = nil
     }
 
     @objc private func quitApp() {

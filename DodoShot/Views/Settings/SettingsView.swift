@@ -12,17 +12,23 @@ struct SettingsView: View {
                 }
                 .tag(0)
 
+            HotkeysSettingsTab()
+                .tabItem {
+                    Label(L10n.Settings.shortcuts, systemImage: "keyboard")
+                }
+                .tag(1)
+
             AISettingsTab()
                 .tabItem {
                     Label(L10n.Settings.ai, systemImage: "sparkles")
                 }
-                .tag(1)
+                .tag(2)
 
             AboutTab()
                 .tabItem {
                     Label(L10n.Settings.about, systemImage: "info.circle")
                 }
-                .tag(2)
+                .tag(3)
         }
         .frame(width: 520, height: 420)
     }
@@ -461,6 +467,8 @@ struct HotkeyRow: View {
 
     @State private var isRecording = false
     @State private var isHovered = false
+    @State private var localMonitor: Any?
+    @State private var globalMonitor: Any?
 
     var body: some View {
         HStack(spacing: 12) {
@@ -481,7 +489,13 @@ struct HotkeyRow: View {
             Spacer()
 
             // Hotkey button
-            Button(action: { isRecording.toggle() }) {
+            Button(action: {
+                if isRecording {
+                    stopRecording()
+                } else {
+                    startRecording()
+                }
+            }) {
                 HStack(spacing: 4) {
                     if isRecording {
                         Circle()
@@ -510,6 +524,67 @@ struct HotkeyRow: View {
             .onHover { hovering in
                 isHovered = hovering
             }
+        }
+        .onDisappear {
+            stopRecording()
+        }
+    }
+
+    private func startRecording() {
+        isRecording = true
+
+        // Local monitor for when the settings window is focused
+        localMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            handleKeyEvent(event)
+            return nil // consume the event
+        }
+
+        // Global monitor for when the settings window is not focused
+        globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
+            handleKeyEvent(event)
+        }
+    }
+
+    private func stopRecording() {
+        isRecording = false
+        if let monitor = localMonitor {
+            NSEvent.removeMonitor(monitor)
+            localMonitor = nil
+        }
+        if let monitor = globalMonitor {
+            NSEvent.removeMonitor(monitor)
+            globalMonitor = nil
+        }
+    }
+
+    private func handleKeyEvent(_ event: NSEvent) {
+        // Escape cancels recording without changing the hotkey
+        if event.keyCode == 53 {
+            DispatchQueue.main.async {
+                stopRecording()
+            }
+            return
+        }
+
+        let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+
+        // Require at least one modifier (Cmd, Shift, Ctrl, or Option)
+        guard modifiers.contains(.command) || modifiers.contains(.control) || modifiers.contains(.option) else {
+            return
+        }
+
+        let displayString = HotkeyManager.displayString(forKeyCode: event.keyCode, modifiers: modifiers)
+
+        // Ignore modifier-only events (no actual key)
+        if displayString.isEmpty {
+            return
+        }
+
+        DispatchQueue.main.async {
+            hotkey = displayString
+            stopRecording()
+            // Re-register hotkeys with the new binding
+            HotkeyManager.shared.reregisterHotkeys()
         }
     }
 }
