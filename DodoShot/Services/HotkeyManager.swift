@@ -7,6 +7,7 @@ class HotkeyManager {
 
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
+    var isTapCreated: Bool { eventTap != nil }
 
     /// Registered hotkey bindings: keyCode -> [(modifiers, action)]
     private var hotkeyBindings: [UInt16: [(CGEventFlags, () -> Void)]] = [:]

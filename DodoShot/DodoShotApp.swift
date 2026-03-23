@@ -45,13 +45,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     private func checkPermissionsAndRegisterHotkeys() {
-        if AXIsProcessTrusted() {
+        let trusted = AXIsProcessTrusted()
+        let diag = "/tmp/lucida-diag.txt"
+        try? "Launch: AXIsProcessTrusted=\(trusted) pid=\(ProcessInfo.processInfo.processIdentifier)\n".write(toFile: diag, atomically: true, encoding: .utf8)
+
+        if trusted {
             hotkeyManager.registerHotkeys()
+            let tapOk = hotkeyManager.isTapCreated
+            try? "Hotkeys registered. tapCreated=\(tapOk)\n".write(toFile: diag, atomically: true, encoding: .utf8)
         } else {
-            // One-time prompt: opens System Settings → Accessibility pane
-            // This is NOT the Screen Recording popup — just a settings redirect
             let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
             AXIsProcessTrustedWithOptions(options)
+            try? "AX not trusted — prompted\n".write(toFile: diag, atomically: true, encoding: .utf8)
         }
     }
 
