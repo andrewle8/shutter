@@ -348,51 +348,18 @@ struct DimensionLabel: View {
     }
 }
 
-// MARK: - Crosshair View (FPS / Quake-inspired minimal crosshair)
+// MARK: - Crosshair View (simple + cursor)
 struct CrosshairView: View {
     let position: CGPoint
     let size: CGSize
 
-    private let gap: CGFloat = 4      // gap from center
-    private let armLength: CGFloat = 8 // length of each arm
-    private let thickness: CGFloat = 1.5
-
     var body: some View {
         ZStack {
-            // Four short arms with a gap in the center — FPS style
-            // Top arm
-            Rectangle()
-                .fill(Color.white)
-                .frame(width: thickness, height: armLength)
-                .position(x: position.x, y: position.y - gap - armLength / 2)
-
-            // Bottom arm
-            Rectangle()
-                .fill(Color.white)
-                .frame(width: thickness, height: armLength)
-                .position(x: position.x, y: position.y + gap + armLength / 2)
-
-            // Left arm
-            Rectangle()
-                .fill(Color.white)
-                .frame(width: armLength, height: thickness)
-                .position(x: position.x - gap - armLength / 2, y: position.y)
-
-            // Right arm
-            Rectangle()
-                .fill(Color.white)
-                .frame(width: armLength, height: thickness)
-                .position(x: position.x + gap + armLength / 2, y: position.y)
-
-            // Tiny center dot
-            Circle()
-                .fill(Color.white)
-                .frame(width: 2, height: 2)
-                .position(position)
-
-            // Coordinate label near crosshair
+            // Just the coordinate label — use system crosshair cursor instead of drawing one
             CoordinateLabel(position: position, screenSize: size)
         }
+        .onAppear { NSCursor.crosshair.push() }
+        .onDisappear { NSCursor.pop() }
     }
 }
 

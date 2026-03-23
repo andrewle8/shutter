@@ -607,6 +607,15 @@ struct AnnotationEditorView: View {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             onCancel()
                         }
+                    },
+                    onCopyAndClose: {
+                        copyToClipboard()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            onCancel()
+                        }
+                    },
+                    onEscapeClose: {
+                        onCancel()
                     }
                     )
                 )
@@ -2309,6 +2318,8 @@ struct AnnotationCanvasView: NSViewRepresentable {
     var onColorPicked: ((Color, String) -> Void)?
     var onTextAdded: ((String, CGPoint) -> Void)?
     var onSaveAndClose: (() -> Void)?
+    var onCopyAndClose: (() -> Void)?
+    var onEscapeClose: (() -> Void)?
 
     func makeNSView(context: Context) -> AnnotationCanvasNSView {
         let view = AnnotationCanvasNSView()
@@ -2338,6 +2349,8 @@ struct AnnotationCanvasView: NSViewRepresentable {
         nsView.onColorPicked = onColorPicked
         nsView.onTextAdded = onTextAdded
         nsView.onSaveAndClose = onSaveAndClose
+        nsView.onCopyAndClose = onCopyAndClose
+        nsView.onEscapeClose = onEscapeClose
         nsView.needsDisplay = true
     }
 
@@ -2598,6 +2611,8 @@ class AnnotationCanvasNSView: NSView, NSTextFieldDelegate {
     var onColorPicked: ((Color, String) -> Void)?
     var onTextAdded: ((String, CGPoint) -> Void)?
     var onSaveAndClose: (() -> Void)?
+    var onCopyAndClose: (() -> Void)?
+    var onEscapeClose: (() -> Void)?
     var sourceImage: NSImage?
 
     private var trackingArea: NSTrackingArea?
@@ -2882,6 +2897,18 @@ class AnnotationCanvasNSView: NSView, NSTextFieldDelegate {
         // CMD+S = Save and close
         if flags == .command && chars == "s" {
             onSaveAndClose?()
+            return true
+        }
+
+        // CMD+C = Copy to clipboard and close
+        if flags == .command && chars == "c" && selectedAnnotationId == nil {
+            onCopyAndClose?()
+            return true
+        }
+
+        // Escape = Close editor
+        if event.keyCode == 53 && flags.isEmpty {
+            onEscapeClose?()
             return true
         }
 
