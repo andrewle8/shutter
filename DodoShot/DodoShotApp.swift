@@ -45,29 +45,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     private func checkPermissionsAndRegisterHotkeys() {
-        let permissionManager = PermissionManager.shared
-        permissionManager.checkPermissions()
-
-        // Try to register hotkeys directly using AXIsProcessTrusted
-        // This is more reliable than checking the @Published property
+        // Only check accessibility (doesn't trigger popups)
+        // Screen recording is checked lazily when a capture is attempted
         if AXIsProcessTrusted() {
-            hotkeyManager.registerHotkeys()
-        } else if permissionManager.isAccessibilityGranted {
             hotkeyManager.registerHotkeys()
         }
     }
 
     private func startPermissionMonitoring() {
-        // Check every 5 seconds if permissions changed.
-        // Uses ScreenCaptureKit which provides accurate real-time status
-        // without triggering the persistent screen recording indicator.
-        // Don't stop polling — macOS can revoke permissions at any time
-        // (e.g. after app updates with ad-hoc signing), and
-        // CGPreflightScreenCaptureAccess caches stale results per-process.
+        // Only poll accessibility permission (no popup).
+        // Screen recording permission is NOT polled — it triggers the
+        // system "would like to record" dialog on macOS 26.
         permissionCheckTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
-            let permissionManager = PermissionManager.shared
-            permissionManager.checkPermissions()
-
             // Register hotkeys once accessibility is granted
             if AXIsProcessTrusted() {
                 self?.hotkeyManager.registerHotkeys()
