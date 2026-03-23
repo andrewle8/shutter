@@ -23,6 +23,9 @@ class ScreenCaptureService: ObservableObject {
     // MARK: - Public Methods
 
     func startCapture(type: CaptureType) {
+        // Prevent double-start
+        guard !isCapturing else { return }
+
         // Save the frontmost app BEFORE any overlay windows appear
         previousApp = NSWorkspace.shared.frontmostApplication
         isCapturing = true
@@ -137,6 +140,14 @@ class ScreenCaptureService: ObservableObject {
 
     private var captureForClaudeMode = false
     private var lastCaptureRect: CGRect?
+
+    /// Reset all capture mode flags to prevent state leaking between captures
+    private func resetCaptureFlags() {
+        autoPasteAfterCapture = false
+        ocrPasteAfterCapture = false
+        captureForClaudeMode = false
+        ocrForceType = nil
+    }
     private var lastCaptureScreen: NSScreen?
 
     /// Start scrolling OCR: select an area, then auto-scroll and OCR each frame,
@@ -1265,6 +1276,7 @@ class ScreenCaptureService: ObservableObject {
     private func cancelCapture() {
         closeCaptureWindows()
         frozenScreenImages.removeAll()
+        resetCaptureFlags()
         isCapturing = false
     }
 

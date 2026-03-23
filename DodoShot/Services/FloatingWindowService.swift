@@ -10,6 +10,7 @@ struct FloatingWindowState {
 }
 
 /// Service for managing floating screenshot windows
+@MainActor
 class FloatingWindowService: ObservableObject {
     static let shared = FloatingWindowService()
 

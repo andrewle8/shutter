@@ -5,6 +5,7 @@ import CoreGraphics
 /// Service for area-based scrolling capture.
 /// The user selects a screen region, then the service auto-scrolls and captures
 /// that same region repeatedly, stitching overlapping frames together.
+@MainActor
 class ScrollingCaptureService: ObservableObject {
     static let shared = ScrollingCaptureService()
 
