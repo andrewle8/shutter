@@ -45,10 +45,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     private func checkPermissionsAndRegisterHotkeys() {
-        // Only check accessibility (doesn't trigger popups)
-        // Screen recording is checked lazily when a capture is attempted
         if AXIsProcessTrusted() {
             hotkeyManager.registerHotkeys()
+        } else {
+            // One-time prompt: opens System Settings → Accessibility pane
+            // This is NOT the Screen Recording popup — just a settings redirect
+            let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
+            AXIsProcessTrustedWithOptions(options)
         }
     }
 
